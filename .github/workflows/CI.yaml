@@ -1,0 +1,35 @@
+name: CI
+
+on: 
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run docker
+      run: docker compose up -d --build
+    - name: Analysing the code with ruff
+      run: docker compose exec web ruff check . 
+    - name: Analysing the code with mypy .
+      run: docker compose exec web ruff check . 
+    - name: Check formating with black
+      run: docker compose exec ruff format . --check
+    - name: Check formating with isort
+      run: docker compose exec web isort . -c -v
+    - name: Run migrations
+      run: docker compose exec web python manage.py migrate
+    - name: Run tests
+      run: docker compose exec web pytest

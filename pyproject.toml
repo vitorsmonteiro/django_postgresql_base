@@ -1,0 +1,116 @@
+[tool.poetry]
+name = "django-postgresql-base"
+version = "0.1.0"
+description = ""
+authors = ["vitorsmonteiro <vitors.monteiro1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0.2"
+redis = "^5.0.2"
+psycopg2-binary = "^2.9.9"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.0"
+isort = "^5.13.2"
+ipython = "^8.22.1"
+pytest = "^8.0.2"
+pytest-cov = "^4.1.0"
+pytest-django = "^4.8.0"
+debugpy = "^1.8.1"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Ignore folders in gitignore
+respect-gitignore = false
+
+# Exclude a variety of commonly ignored directories.
+extend-exclude = [
+    "migrations",
+    "manage.py"
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.8
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["ALL"]
+ignore = ["D100", "D104", "D203", "D213", "ISC001", "COM812"]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = true
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = 88
+
+[tool.coverage.run]
+omit = [
+    # omit everything in project, manage.py and migrations folders
+    "main_project/*",
+    "manage.py",
+    "migrations/*",
+    "test*.py",
+    "urls.py",
+    "__init__.py",
+]
+source = ["."]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "main_project.settings"
+addopts = "-p no:warnings --create-db -v --cov"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+[tool.coverage.report]
+exclude_also = ["def __str__"]
+fail_under = 80
+
+[tool.isort]
+profile = "black"
+skip = [".venv", ".github", ".vscode", "migrations"]
+
+[tool.mypy]
+exclude = [
+    "migrations"
+]
+disable_error_code = "import-untyped"
