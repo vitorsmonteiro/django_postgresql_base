@@ -16,6 +16,21 @@
         "host": "127.0.0.1",
       },
       "django": true
-    }
+    },
+    {
+      "name": "Python: Debug Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "purpose": [
+        "debug-test"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "DJANGO_SECRET_KEY": "foo",
+        "PYTEST_ADDOPTS": "--no-cov"
+      }
+    },
   ],
 }
