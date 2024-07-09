@@ -93,6 +93,7 @@ omit = [
     "test*.py",
     "urls.py",
     "__init__.py",
+    "apps.py",
 ]
 source = ["."]
 

@@ -22,13 +22,11 @@ jobs:
     - name: Run docker
       run: docker compose up -d --build
     - name: Analysing the code with ruff
-      run: docker compose exec web ruff check . 
-    - name: Analysing the code with mypy .
-      run: docker compose exec web ruff check . 
+      run: docker compose exec web ruff check 
+    - name: Analysing the code with mypy
+      run: docker compose exec web mypy .
     - name: Check formating with black
-      run: docker compose exec ruff format . --check
-    - name: Check formating with isort
-      run: docker compose exec web isort . -c -v
+      run: docker compose exec web ruff format --check
     - name: Run migrations
       run: docker compose exec web python manage.py migrate
     - name: Run tests
