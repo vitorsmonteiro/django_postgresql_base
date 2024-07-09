@@ -26,7 +26,7 @@ jobs:
     - name: Analysing the code with mypy
       run: docker compose exec web mypy .
     - name: Check formating with black
-      run: docker compose exec ruff format --check
+      run: docker compose exec web ruff format --check
     - name: Run migrations
       run: docker compose exec web python manage.py migrate
     - name: Run tests
