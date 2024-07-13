@@ -4,4 +4,5 @@ set -o errexit
 set -o nounset
 
 rm -f './celerybeat.pid'
-celery -A django_celery_example beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+# celery -A main_project beat -l info -Q high_priority,default
+celery -A main_project beat -l info

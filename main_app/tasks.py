@@ -42,9 +42,7 @@ def xsum(numbers: list[float]) -> int | float:
     return sum(numbers)
 
 
-@shared_task(name="task_clear_session")
-def task_clear_session() -> None:
-    """Clear session from cache."""
-    from django.core.management import call_command
-
-    call_command("clearsessions")
+@shared_task()
+def say_hello() -> None:
+    """Demo scheduled task."""
+    print("Hello")  # noqa: T201
