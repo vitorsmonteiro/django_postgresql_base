@@ -18,4 +18,13 @@ COPY pyproject.toml .
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-ansi
 
+COPY celery/start_worker.sh /start_worker.sh
+RUN chmod +x /start_worker.sh
+
+COPY celery/start_beat.sh /start_beat.sh
+RUN chmod +x /start_beat.sh
+
+COPY celery/start_flower.sh /start_flower.sh
+RUN chmod +x /start_flower.sh
+
 COPY . .
