@@ -33,12 +33,12 @@ class CreateCar(CreateView):
     success_url = reverse_lazy("main_app:car_list")
 
 
-
 class UpdateCar(UpdateView):
     """Update Car model view."""
 
     model = Car
     fields: ClassVar[list[str]] = ["name", "manufacturer"]
+    success_url = reverse_lazy("main_app:car_list")
 
 
 class DeleteCar(DeleteView):
@@ -67,6 +67,7 @@ class UpdateManufacturer(UpdateView):
 
     model = Manufacturer
     fields: ClassVar[list[str]] = ["name"]
+    success_url = reverse_lazy("main_app:manufacturer_list")
 
 
 class DeleteManufacturer(DeleteView):

@@ -84,7 +84,6 @@ DATABASES = {
         "NAME": os.getenv("DB_NAME", "main_db"),
         "PORT": os.getenv("DB_PORT", "5432"),
         "PASSWORD": os.getenv("DB_PASSWORD", "password"),
-        "TEST": {"NAME": "test_db"},
     },
 }
 
