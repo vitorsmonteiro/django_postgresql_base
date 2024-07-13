@@ -1,0 +1,17 @@
+{% extends "main_project/base.html" %}
+
+{% block content %}
+
+<div>
+    <form method="post">{% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Save">
+    </form>
+</div>
+
+<div>
+    <a href="{% url 'main_app:car_delete' pk=object.id %}"><button type="button"
+            class="btn btn-primary">Delete</button></a>
+</div>
+
+{% endblock %}
