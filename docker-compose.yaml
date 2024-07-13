@@ -53,7 +53,7 @@ services:
       context: .
       dockerfile: Dockerfile-dev
     image: celery_worker
-    command: /start_celery_worker.sh
+    command: /start_worker.sh
     volumes:
       - .:/usr/src/app
     env_file:
@@ -67,7 +67,7 @@ services:
       context: .
       dockerfile: Dockerfile-dev
     image: celery_beat
-    command: /start_celery_beat.sh
+    command: /start_beat.sh
     volumes:
       - .:/usr/src/app
     env_file:
