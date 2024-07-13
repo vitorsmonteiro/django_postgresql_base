@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
-from kombu import Queue
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -148,11 +146,3 @@ CELERY_TASK_DEFAULT_QUEUE = "default"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-
-# # Force all queues to be explicitly listed in `CELERY_TASK_QUEUES` to help prevent typos
-# CELERY_TASK_CREATE_MISSING_QUEUES = False
-# CELERY_TASK_QUEUES = (
-#     Queue("default"),
-#     Queue("high_priority"),
-#     Queue("low_priority"),
-# )
