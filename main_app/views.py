@@ -6,6 +6,9 @@ from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from main_app.models import Car, Manufacturer
 
+CAR_LIST_URL = reverse_lazy("main_app:car_list")
+MAN_LIST_URL = reverse_lazy("main_app:manufacturer_list")
+
 
 def home(request: HttpRequest) -> HttpResponse:
     """Home view for the main app.
@@ -30,7 +33,7 @@ class CreateCar(CreateView):
 
     model = Car
     fields: ClassVar[list[str]] = ["name", "manufacturer"]
-    success_url = reverse_lazy("main_app:car_list")
+    success_url = CAR_LIST_URL
 
 
 class UpdateCar(UpdateView):
@@ -38,14 +41,14 @@ class UpdateCar(UpdateView):
 
     model = Car
     fields: ClassVar[list[str]] = ["name", "manufacturer"]
-    success_url = reverse_lazy("main_app:car_list")
+    success_url = CAR_LIST_URL
 
 
 class DeleteCar(DeleteView):
     """Delete Car model view."""
 
     model = Car
-    success_url = reverse_lazy("main_app:car_list")
+    success_url = CAR_LIST_URL
 
 
 class ListManufacturer(ListView):
@@ -59,7 +62,7 @@ class CreateManufacturer(CreateView):
 
     model = Manufacturer
     fields: ClassVar[list[str]] = ["name"]
-    success_url = reverse_lazy("main_app:manufacturer_list")
+    success_url = MAN_LIST_URL
 
 
 class UpdateManufacturer(UpdateView):
@@ -67,11 +70,11 @@ class UpdateManufacturer(UpdateView):
 
     model = Manufacturer
     fields: ClassVar[list[str]] = ["name"]
-    success_url = reverse_lazy("main_app:manufacturer_list")
+    success_url = MAN_LIST_URL
 
 
 class DeleteManufacturer(DeleteView):
     """Delete Manufacturer model view."""
 
     model = Manufacturer
-    success_url = reverse_lazy("main_app:manufacturer_list")
+    success_url = MAN_LIST_URL
