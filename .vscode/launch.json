@@ -27,8 +27,8 @@
       ],
       "console": "integratedTerminal",
       "justMyCode": true,
+      "envFile": "${workspaceFolder}/.env",
       "env": {
-        "DJANGO_SECRET_KEY": "foo",
         "PYTEST_ADDOPTS": "--no-cov",
       }
     },
