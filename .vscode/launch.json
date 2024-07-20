@@ -23,13 +23,13 @@
       "request": "launch",
       "program": "${file}",
       "purpose": [
-        "debug-test",
+        "debug-test",,
       ],
       "console": "integratedTerminal",
       "justMyCode": true,
+      "envFile": "${workspaceFolder}/.env",
       "env": {
-        "DJANGO_SECRET_KEY": "foo",
-        "PYTEST_ADDOPTS": "--no-cov",
+        "PYTEST_ADDOPTS": "--no-cov",,
       }
     },
   ],
