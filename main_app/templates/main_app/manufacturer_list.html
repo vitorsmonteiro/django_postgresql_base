@@ -1,0 +1,16 @@
+{% extends "main_project/base.html" %}
+
+{% block content %}
+
+<h1>Manufacturers</h1>
+<table>
+
+    {% for object in object_list %}
+    <tr>
+        <td><a href="{% url 'main_app:manufacturer_update' pk=object.id %}" class="button">{{ object.name }}</a></td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+{% endblock %}

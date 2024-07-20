@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "main_project",
     "main_app",
     "django_celery_beat",
 ]
@@ -83,18 +84,14 @@ DATABASES = {
         "NAME": os.getenv("DB_NAME", "main_db"),
         "PORT": os.getenv("DB_PORT", "5432"),
         "PASSWORD": os.getenv("DB_PASSWORD", "password"),
-        "TEST": {"NAME": "test_db"},
     },
 }
 
 # Redis cache
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}",
     }
 }
 
