@@ -10,7 +10,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
+
+# Find if application is run as part of tests
+TESTING = "pytest" in sys.modules
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +31,7 @@ DEBUG = bool(int(os.getenv("DJANGO_DEBUG", "0")))
 
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOST", "localhost").split(",")
 
-
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     "main_app",
     "django_celery_beat",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -88,12 +91,19 @@ DATABASES = {
 }
 
 # Redis cache
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": f"redis://{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}",
+if TESTING or bool(int(os.getenv("NO_CACHE", "0"))):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": f"redis://{os.getenv('REDIS_HOST')}:{os.getenv('REDIS_PORT')}",
+        }
+    }
 
 
 # Password validation
@@ -143,3 +153,15 @@ CELERY_TASK_DEFAULT_QUEUE = "default"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+# Django Debug Toolbar
+INTERNAL_IPS = ["127.0.0.1", "172.18.0.1"]
+if not TESTING:
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+        *MIDDLEWARE,
+    ]
