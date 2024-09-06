@@ -25,6 +25,8 @@ jobs:
       run: docker compose exec web ruff check 
     - name: Analysing the code with mypy
       run: docker compose exec web mypy .
+    - name: Check formating with djlint
+      run: docker compose exec web djlint .
     - name: Check formating with black
       run: docker compose exec web ruff format --check
     - name: Run migrations

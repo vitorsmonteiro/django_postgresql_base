@@ -16,6 +16,7 @@ flower = "^2.0.1"
 django-redis = "^5.4.0"
 kombu = "^5.3.7"
 
+djlint = "^1.35.2"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"
 isort = "^5.13.2"
@@ -36,10 +37,7 @@ build-backend = "poetry.core.masonry.api"
 respect-gitignore = false
 
 # Exclude a variety of commonly ignored directories.
-extend-exclude = [
-    "migrations",
-    "manage.py"
-]
+extend-exclude = ["migrations", "manage.py"]
 
 # Same as Black.
 line-length = 88
@@ -53,7 +51,17 @@ target-version = "py312"
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 select = ["ALL"]
-ignore = ["D100", "D104", "D203", "D213", "ISC001", "COM812", "D407", "D413", "S101"]
+ignore = [
+    "D100",
+    "D104",
+    "D203",
+    "D213",
+    "ISC001",
+    "COM812",
+    "D407",
+    "D413",
+    "S101",
+]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -117,7 +125,9 @@ profile = "black"
 skip = [".venv", ".github", ".vscode", "migrations"]
 
 [tool.mypy]
-exclude = [
-    "migrations"
-]
+exclude = ["migrations"]
 disable_error_code = "import-untyped"
+
+
+[tool.djlint]
+ignore = "H031,H037"

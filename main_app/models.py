@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from main_app.caching import CachedManager
+from main_app.managers import CachedManager
 
 CAR_CACHE_KEY = "car_data"
 MANUFACTURER_CACHE_KEY = "manufacturer_data"
@@ -46,8 +46,7 @@ class Car(models.Model):
         return super().save(*args, **kwargs)
 
 
-@receiver(post_save, sender=Car)
-@receiver(post_delete, sender=Car)
+@receiver([post_save, post_delete], sender=Car, weak=True)
 def update_car_cache(sender: models.Model, **kwargs) -> None:  # noqa: ARG001, ANN003
     """Update cached date for Car model."""
     cache.delete(CAR_CACHE_KEY)
@@ -55,8 +54,7 @@ def update_car_cache(sender: models.Model, **kwargs) -> None:  # noqa: ARG001, A
     cache.set(CAR_CACHE_KEY, data)
 
 
-@receiver(post_save, sender=Manufacturer)
-@receiver(post_delete, sender=Manufacturer)
+@receiver([post_save, post_delete], sender=Manufacturer, weak=True)
 def update_manufacturer_cache(sender: models.Model, **kwargs) -> None:  # noqa: ANN003, ARG001:
     """Update cached date for Manufacturer model."""
     cache.delete(MANUFACTURER_CACHE_KEY)
