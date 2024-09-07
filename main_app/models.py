@@ -56,4 +56,3 @@ def update_manufacturer_cache(sender: models.Model, **kwargs) -> None:  # noqa: 
     man_data = Manufacturer.objects.all()
     cache.set(CAR_CACHE_KEY, car_data)
     cache.set(MANUFACTURER_CACHE_KEY, man_data)
-
