@@ -1,0 +1,23 @@
+<table class="table table-striped">
+    <thead>
+        <th>Name</th>
+        <th>Manufacturer</th>
+        <th></th>
+    </thead>
+    <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'main_app:car_update' pk=object.id %}" class="button">{{ object.name }}</a>
+                </td>
+                <td>{{ object.manufacturer }}</td>
+                <td class="text-end">
+                    <a href="{% url 'main_app:car_delete' pk=object.id %}"><i class="fa-solid fa-trash"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="container">
+    {% include "main_app/components/pagination.html" %}
+</div>
