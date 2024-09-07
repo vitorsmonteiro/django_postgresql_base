@@ -1,14 +1,35 @@
 {% extends "main_app/base.html" %}
 {% block content %}
-    <h1>Manufacturers</h1>
-    <table>
-        {% for object in object_list %}
-            <tr>
-                <td>
-                    <a href="{% url 'main_app:manufacturer_update' pk=object.id %}"
-                       class="button">{{ object.name }}</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Manufacturers</h1>
+            </div>
+            <div class="col text-end">
+                <a href="{% url 'main_app:manufacturer_create' %}"
+                   class="btn btn-primary">Add new manufacurer</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <table class="table table-striped">
+            <thead>
+                <th>Name</th>
+                <th></th>
+            </thead>
+            <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'main_app:manufacturer_update' pk=object.id %}"
+                               class="button">{{ object.name }}</a>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'main_app:manufacturer_delete' pk=object.id %}"><i class="fa-solid fa-trash"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock content %}

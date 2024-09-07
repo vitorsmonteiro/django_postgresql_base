@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "main_app",
     "django_celery_beat",
+    "fontawesomefree",
 ]
 
 
