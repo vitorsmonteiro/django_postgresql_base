@@ -165,3 +165,6 @@ if not TESTING:
         "debug_toolbar.middleware.DebugToolbarMiddleware",
         *MIDDLEWARE,
     ]
+
+# Common settings
+PAGINATION_SIZE = 20

@@ -47,16 +47,12 @@ class Car(models.Model):
 
 
 @receiver([post_save, post_delete], sender=Car, weak=True)
-def update_car_cache(sender: models.Model, **kwargs) -> None:  # noqa: ARG001, ANN003
-    """Update cached date for Car model."""
-    cache.delete(CAR_CACHE_KEY)
-    data = sender.objects.all()
-    cache.set(CAR_CACHE_KEY, data)
-
-
 @receiver([post_save, post_delete], sender=Manufacturer, weak=True)
 def update_manufacturer_cache(sender: models.Model, **kwargs) -> None:  # noqa: ANN003, ARG001:
-    """Update cached date for Manufacturer model."""
+    """Update cached date."""
     cache.delete(MANUFACTURER_CACHE_KEY)
-    data = sender.objects.all()
-    cache.set(MANUFACTURER_CACHE_KEY, data)
+    cache.delete(CAR_CACHE_KEY)
+    car_data = Car.objects.all()
+    man_data = Manufacturer.objects.all()
+    cache.set(CAR_CACHE_KEY, car_data)
+    cache.set(MANUFACTURER_CACHE_KEY, man_data)
