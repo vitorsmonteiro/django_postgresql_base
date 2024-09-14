@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from simple_history.models import HistoricalRecords
 
 from main_app.managers import CachedManager
 
@@ -17,6 +18,7 @@ class Manufacturer(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     objects = CachedManager(cache_key=MANUFACTURER_CACHE_KEY)
+    history = HistoricalRecords()
 
     def __str__(self: Self) -> str:
         """Retunt the string representation of the model."""
@@ -30,6 +32,7 @@ class Car(models.Model):
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
 
     objects = CachedManager(cache_key=CAR_CACHE_KEY)
+    history = HistoricalRecords()
 
     class Meta:
         """Model meta data."""
