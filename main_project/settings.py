@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "main_app",
+    "common",
+    "authentication",
     "django_celery_beat",
     "fontawesomefree",
     "simple_history",
@@ -170,3 +171,6 @@ if not TESTING:
 
 # Common settings
 PAGINATION_SIZE = 20
+
+# Replace default user model
+AUTH_USER_MODEL = "authentication.User"
