@@ -101,6 +101,10 @@ docstring-code-format = true
 # enabled.
 docstring-code-line-length = 88
 
+# Make parenthesis not required for fixtures
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+
 [tool.coverage.run]
 omit = [
     # omit everything in project, manage.py and migrations folders

@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
 from authentication.forms import CreateUserForm, LoginForm, ResetPasswordForm
 
 User = get_user_model()
-HOME = "common/home.html"
+HOME = reverse_lazy("common:home")
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
@@ -22,9 +23,9 @@ def login_view(request: HttpRequest) -> HttpResponse:
         return render(request, "authentication/login_form.html")
     form = LoginForm(request.POST)
     if form.is_valid():
-        user = User.objects.get(**form.cleaned_data)
+        user = User.objects.get(email=form.cleaned_data["email"])
         login(request, user)
-        return render(request, HOME)
+        return redirect(HOME)
     return render(request, "authentication/login_form.html", {"errors": form.errors})
 
 
@@ -38,7 +39,7 @@ def logout_view(request: HttpRequest) -> HttpResponse:
         HttpResponse: Response
     """
     logout(request)
-    return render(request, HOME)
+    return redirect(HOME)
 
 
 def create_user(request: HttpRequest) -> HttpResponse:
@@ -54,15 +55,13 @@ def create_user(request: HttpRequest) -> HttpResponse:
         return render(request, "authentication/create_user.html")
     form = CreateUserForm(request.POST)
     if form.is_valid():
-        user = User(
-            name=form.cleaned_data["name"],
-            email=form.cleaned_data["email"],
-        )
+        user = User(email=form.cleaned_data["email"])
         user.set_password(form.cleaned_data["password"])
         user.save()
         login(request, user)
-        return render(request, HOME)
+        return redirect(HOME)
     return render(request, "authentication/create_user.html", {"errors": form.errors})
+
 
 @login_required
 def reset_password(request: HttpRequest) -> HttpResponse:
@@ -83,9 +82,12 @@ def reset_password(request: HttpRequest) -> HttpResponse:
         user.save()
         login(request, user)
         return render(request, "authentication/reset_password.html", {"success": True})
-    return render(request, "authentication/reset_password.html", {"errors": form.errors})
+    return render(
+        request, "authentication/reset_password.html", {"errors": form.errors}
+    )
 
 
+@login_required
 def delete_account(request: HttpRequest) -> HttpResponse:
     """Delere user view.
 
@@ -95,4 +97,8 @@ def delete_account(request: HttpRequest) -> HttpResponse:
     Returns:
         HttpResponse: Response
     """
-    render(request, "authentication/delete_user.html")
+    if request.method == "GET":
+        return render(request, "authentication/delete_user.html")
+    user = request.user
+    user.delete()
+    return redirect(HOME)

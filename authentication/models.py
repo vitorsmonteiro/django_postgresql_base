@@ -60,7 +60,6 @@ class User(AbstractBaseUser):
     """Custom User Model."""
 
     email = models.EmailField(unique=True, blank=False, null=False)
-    name = models.CharField(max_length=150, null=False, blank=False)
     objects = UserManager()
     is_staff = models.BooleanField(default=False, blank=True)
     is_superuser = models.BooleanField(default=False, blank=True)

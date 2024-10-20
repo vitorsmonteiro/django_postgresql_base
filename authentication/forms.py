@@ -2,6 +2,7 @@ from typing import Any, ClassVar, Self
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
@@ -24,7 +25,8 @@ class LoginForm(forms.Form):
         if not User.objects.filter(email=email):
             msg = {"email": "User not found"}
             raise ValidationError(msg, code="user")
-        if not User.objects.filter(email=email, password=password):
+        user = User.objects.filter(email=email)[0]
+        if not check_password(password=password, encoded=user.password):
             msg = {"password": "Password does not match"}
             raise ValidationError(msg)
         return self.cleaned_data
@@ -54,7 +56,6 @@ class ResetPasswordForm(forms.Form):
 class CreateUserForm(forms.ModelForm):
     """Create user form."""
 
-    name = forms.CharField(max_length=150, required=True)
     email = forms.EmailField(required=True)
     password = forms.CharField(
         max_length=50, required=True, widget=forms.PasswordInput()
@@ -64,7 +65,7 @@ class CreateUserForm(forms.ModelForm):
         """Form meta data."""
 
         model = get_user_model()
-        fields: ClassVar[list[str]] = ["name", "email", "password"]
+        fields: ClassVar[list[str]] = ["email", "password"]
 
     def clean(self: Self) -> dict[str, Any]:
         """Perform form validation."""
