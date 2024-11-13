@@ -174,3 +174,4 @@ PAGINATION_SIZE = 20
 
 # Replace default user model
 AUTH_USER_MODEL = "authentication.User"
+LOGIN_URL = "authentication:login"
