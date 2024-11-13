@@ -31,6 +31,9 @@ dev = [
     "ruff>=0.7.3",
 ]
 
+[tool.ruff]
+extend-exclude = ["migrations", ".venv", "manage.py"]
+
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
