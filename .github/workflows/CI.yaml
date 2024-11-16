@@ -29,14 +29,14 @@ jobs:
       - name: Run docker logs
         run: docker compose logs web -f
       - name: Analysing the code with ruff
-        run: docker compose exec web ruff check
+        run: docker compose exec web uv run ruff check
       - name: Analysing the code with mypy
-        run: docker compose exec web mypy .
+        run: docker compose exec web uv run mypy .
       - name: Check formating with djlint
-        run: docker compose exec web djlint .
+        run: docker compose exec web uv run djlint .
       - name: Check formating with black
-        run: docker compose exec web ruff format --check
+        run: docker compose exec web uv run ruff format --check
       - name: Run migrations
-        run: docker compose exec web python manage.py migrate
+        run: docker compose exec web ub run python manage.py migrate
       - name: Run tests
-        run: docker compose exec web pytest
+        run: docker compose exec web uv run pytest
