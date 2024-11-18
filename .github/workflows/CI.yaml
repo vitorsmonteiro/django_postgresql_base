@@ -30,13 +30,19 @@ jobs:
         run: docker compose up -d --build
       - name: Analysing the code with ruff
         run: docker compose exec web ruff check
+        if: always()
       - name: Analysing the code with mypy
         run: docker compose exec web mypy .
+        if: always()
       - name: Check formating with djlint
         run: docker compose exec web djlint .
+        if: always()
       - name: Check formating with black
         run: docker compose exec web ruff format --check
+        if: always()
       - name: Run migrations
         run: docker compose exec web python manage.py migrate
+        if: always()
       - name: Run tests
         run: docker compose exec web pytest
+        if: always()
