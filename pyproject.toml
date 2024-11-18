@@ -96,12 +96,13 @@ omit = [
     # omit everything in project, manage.py and migrations folders
     "main_project/*",
     "manage.py",
-    "migrations/*",
+    "*/migrations/*",
     "test*.py",
     "urls.py",
     "__init__.py",
     "apps.py",
     "celery_worker.py",
+    "conftest.py",
 ]
 source = ["."]
 
