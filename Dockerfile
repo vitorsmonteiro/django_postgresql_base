@@ -24,9 +24,6 @@ COPY pyproject.toml .
 # Install the application dependencies.
 RUN uv sync --frozen --no-cache
 
-# Activate the project virtual environment
-# ENV PATH="/app/.venv/bin:$PATH"
-
 COPY celery/start_worker.sh /start_worker.sh
 RUN chmod +x /start_worker.sh
 

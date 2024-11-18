@@ -19,6 +19,7 @@ env:
   ACTIONS_RUNNER_DEBUG: ${{ inputs.runnerLevel && true || false }}
   ACTIONS_STEP_DEBUG: ${{ inputs.stepLevel && true || false }}
   UV_NO_SYNC: true
+  # PATH: "/app/.venv/bin:$PATH"
 
 jobs:
   build:
@@ -28,14 +29,14 @@ jobs:
       - name: Run docker
         run: docker compose up -d --build
       - name: Analysing the code with ruff
-        run: docker compose exec web uv run ruff check
+        run: docker compose exec web ruff check
       - name: Analysing the code with mypy
-        run: docker compose exec web uv run mypy .
+        run: docker compose exec web mypy .
       - name: Check formating with djlint
-        run: docker compose exec web uv run djlint .
+        run: docker compose exec web djlint .
       - name: Check formating with black
-        run: docker compose exec web uv run ruff format --check
+        run: docker compose exec web ruff format --check
       - name: Run migrations
-        run: docker compose exec web uv run python manage.py migrate
+        run: docker compose exec web python manage.py migrate
       - name: Run tests
-        run: docker compose exec web uv run pytest
+        run: docker compose exec web pytest
