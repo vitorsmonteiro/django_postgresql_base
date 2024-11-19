@@ -20,6 +20,7 @@ env:
   ACTIONS_STEP_DEBUG: ${{ inputs.stepLevel && true || false }}
   UV_NO_SYNC: true
   UV_PROJECT_ENVIRONMENT: .venv
+  UV_LINK_MODE: copy
 
 jobs:
   build:
