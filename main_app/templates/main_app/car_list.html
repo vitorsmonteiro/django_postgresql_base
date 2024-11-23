@@ -1,0 +1,25 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Cars</h1>
+            </div>
+            <div class="col text-end">
+                <a href="{% url 'main_app:car_create' %}" class="btn btn-primary">Add new car</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <input class="form-control"
+               type="search"
+               name="search"
+               placeholder="Begin typing search cars..."
+               hx-get=""
+               hx-trigger="input changed delay:100ms, search"
+               hx-target="#search-results">
+    </div>
+    <div class="container mt-1" id="search-results">
+        {% include "main_app/components/car_search_result.html" %}
+    </div>
+{% endblock content %}
