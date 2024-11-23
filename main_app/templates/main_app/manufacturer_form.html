@@ -1,0 +1,18 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="input-group">
+        <form method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Name</span>
+                <input type="text"
+                       name="name"
+                       class="form-control"
+                       placeholder="Manufacurer"
+                       value="{{ form.initial.name }}"
+                       required>
+            </div>
+            <input type="submit" value="Save" class="btn btn-primary">
+        </form>
+    </div>
+{% endblock content %}

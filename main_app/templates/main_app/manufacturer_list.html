@@ -1,0 +1,26 @@
+{% extends "main_app/base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Manufacturers</h1>
+            </div>
+            <div class="col text-end">
+                <a href="{% url 'main_app:manufacturer_create' %}"
+                   class="btn btn-primary">Add new manufacurer</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <input class="form-control"
+               type="search"
+               name="search"
+               placeholder="Begin typing search manufacturers..."
+               hx-get=""
+               hx-trigger="input changed delay:100ms, search"
+               hx-target="#search-results">
+    </div>
+    <div class="container mt-1" id="search-results">
+        {% include "main_app/components/manufacturer_search_result.html" %}
+    </div>
+{% endblock content %}

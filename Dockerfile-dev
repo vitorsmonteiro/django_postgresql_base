@@ -1,31 +1,22 @@
-FROM python:3.13-slim
+FROM python:3.11.4-slim-buster
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && \
-    apt-get -y install gcc postgresql curl ca-certificates && \
+    apt-get -y install gcc postgresql && \
     apt-get clean
 
-# Download the latest installer
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN pip install --upgrade pip
+RUN pip install poetry
 
-# Run the installer then remove it
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-
-# Ensure the installed binary is on the `PATH`
-ENV PATH="/root/.local/bin/:$PATH"
-
-COPY uv.lock .
+COPY poetry.lock .
 COPY pyproject.toml .
 
-# Install the application dependencies.
-RUN uv sync --frozen --no-cache --all-packages
-
-# Add .venv to PATH
-ENV PATH="/app/.venv/bin:$PATH"
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-interaction --no-ansi
 
 COPY celery/start_worker.sh /start_worker.sh
 RUN chmod +x /start_worker.sh

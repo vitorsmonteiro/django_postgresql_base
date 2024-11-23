@@ -4,9 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-dev
-    command: "uv run python manage.py runserver 0.0.0.0:8000"
+    command: "python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/app
+      - .:/usr/src/app
     ports:
       - 8000:8000
       - 3000:3000
@@ -55,7 +55,7 @@ services:
     image: celery_worker
     command: /start_worker.sh
     volumes:
-      - .:/app
+      - .:/usr/src/app
     env_file:
       - .env.dev
     depends_on:
@@ -69,7 +69,7 @@ services:
     image: celery_beat
     command: /start_beat.sh
     volumes:
-      - .:/app
+      - .:/usr/src/app
     env_file:
       - .env.dev
     depends_on:
@@ -83,7 +83,7 @@ services:
     image: celery_flower
     command: /start_flower.sh
     volumes:
-      - .:/app
+      - .:/usr/src/app
     env_file:
       - .env.dev
     ports:
