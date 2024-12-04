@@ -1,35 +1,41 @@
 name: CI
 
-on: 
+on:
   pull_request:
   workflow_dispatch:
     inputs:
       logLevel:
-        description: 'Log level'
+        description: "Log level"
         required: true
-        default: 'warning'
+        default: "warning"
         type: choice
         options:
-        - info
-        - warning
-        - debug
+          - info
+          - warning
+          - debug
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Run docker
-      run: docker compose up -d --build
-    - name: Analysing the code with ruff
-      run: docker compose exec web ruff check 
-    - name: Analysing the code with mypy
-      run: docker compose exec web mypy .
-    - name: Check formating with djlint
-      run: docker compose exec web djlint .
-    - name: Check formating with black
-      run: docker compose exec web ruff format --check
-    - name: Run migrations
-      run: docker compose exec web python manage.py migrate
-    - name: Run tests
-      run: docker compose exec web pytest
+      - uses: actions/checkout@v3
+      - name: Run docker
+        run: docker compose up -d --build
+      - name: Analysing the code with ruff
+        run: docker compose exec web ruff check
+        if: always()
+      - name: Analysing the code with mypy
+        run: docker compose exec web mypy .
+        if: always()
+      - name: Check formating with djlint
+        run: docker compose exec web djlint .
+        if: always()
+      - name: Check formating with black
+        run: docker compose exec web ruff format --check
+        if: always()
+      - name: Run migrations
+        run: docker compose exec web python manage.py migrate
+        if: always()
+      - name: Run tests
+        run: docker compose exec web pytest
+        if: always()
