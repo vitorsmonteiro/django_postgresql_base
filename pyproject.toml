@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["vitorsmonteiro <vitors.monteiro1@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -15,10 +16,11 @@ django-celery-beat = "^2.6.0"
 flower = "^2.0.1"
 django-redis = "^5.4.0"
 kombu = "^5.3.7"
-
 djlint = "^1.35.2"
 fontawesomefree = "^6.6.0"
 django-simple-history = "^3.7.0"
+pillow = "^11.0.0"
+
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"
 isort = "^5.13.2"
@@ -63,6 +65,8 @@ ignore = [
     "D407",
     "D413",
     "S101",
+    "TRY003",
+    "D401",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -98,6 +102,10 @@ docstring-code-format = true
 # This only has an effect when the `docstring-code-format` setting is
 # enabled.
 docstring-code-line-length = 88
+
+# Make parenthesis not required for fixtures
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
 
 [tool.coverage.run]
 omit = [
