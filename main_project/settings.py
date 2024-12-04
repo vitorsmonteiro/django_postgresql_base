@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "common",
     "authentication",
+    "todo",
     "django_celery_beat",
     "fontawesomefree",
     "simple_history",
