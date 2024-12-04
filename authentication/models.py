@@ -59,7 +59,13 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     """Custom User Model."""
 
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True, blank=False, null=False)
+    profile_image = models.ImageField(
+        upload_to="static/authentication/img/",
+        default="static/authentication/img/blank_profile.jpg",
+    )
     objects = UserManager()
     is_staff = models.BooleanField(default=False, blank=True)
     is_superuser = models.BooleanField(default=False, blank=True)

@@ -16,10 +16,11 @@ django-celery-beat = "^2.6.0"
 flower = "^2.0.1"
 django-redis = "^5.4.0"
 kombu = "^5.3.7"
-
 djlint = "^1.35.2"
 fontawesomefree = "^6.6.0"
 django-simple-history = "^3.7.0"
+pillow = "^11.0.0"
+
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"
 isort = "^5.13.2"

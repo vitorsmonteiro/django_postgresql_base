@@ -1,12 +1,18 @@
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.uploadedfile import UploadedFile  # noqa: TCH002
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 
-from authentication.forms import CreateUserForm, LoginForm, ResetPasswordForm
+from authentication.forms import (
+    CreateUserForm,
+    EditUserForm,
+    LoginForm,
+    ResetPasswordForm,
+)
+from authentication.models import User
 
-User = get_user_model()
 HOME = reverse_lazy("common:home")
 
 
@@ -29,6 +35,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
     return render(request, "authentication/login_form.html", {"errors": form.errors})
 
 
+@login_required
 def logout_view(request: HttpRequest) -> HttpResponse:
     """Logout view.
 
@@ -53,9 +60,15 @@ def create_user(request: HttpRequest) -> HttpResponse:
     """
     if request.method == "GET":
         return render(request, "authentication/create_user.html")
-    form = CreateUserForm(request.POST)
+    form = CreateUserForm(request.POST, request.FILES)
     if form.is_valid():
-        user = User(email=form.cleaned_data["email"])
+        profile_image = form.cleaned_data.get("profile_image")
+        user = User(
+            first_name=form.cleaned_data["first_name"],
+            last_name=form.cleaned_data["last_name"],
+            email=form.cleaned_data["email"],
+            profile_image=profile_image,
+        )
         user.set_password(form.cleaned_data["password"])
         user.save()
         login(request, user)
@@ -102,3 +115,31 @@ def delete_account(request: HttpRequest) -> HttpResponse:
     user = request.user
     user.delete()
     return redirect(HOME)
+
+
+@login_required
+def edit_user(request: HttpRequest) -> HttpResponse:
+    """Edit user view.
+
+    Args:
+        request (HttpRequest): Request
+
+    Returns:
+        HttpResponse: Response
+    """
+    if request.method == "GET":
+        return render(request, "authentication/edit_user.html")
+    form = EditUserForm(request.POST, request.FILES)
+    if form.is_valid():
+        profile_image: UploadedFile = form.cleaned_data["profile_image"]
+        user: User = request.user
+        user.first_name = form.cleaned_data["first_name"]
+        user.last_name = form.cleaned_data["last_name"]
+        user.email = form.cleaned_data["email"]
+        if profile_image:
+            extension = profile_image._name.split(".")[-1]  # noqa: SLF001
+            profile_image._set_name(f"profile_image_{user.pk}.{extension}")  # noqa: SLF001
+            user.profile_image = profile_image
+        user.save()
+        return redirect(HOME)
+    return render(request, "authentication/edit_user.html", {"errors": form.errors})

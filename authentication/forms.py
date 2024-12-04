@@ -4,7 +4,6 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 
 User = get_user_model()
 
@@ -56,6 +55,8 @@ class ResetPasswordForm(forms.Form):
 class CreateUserForm(forms.ModelForm):
     """Create user form."""
 
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
     password = forms.CharField(
         max_length=50, required=True, widget=forms.PasswordInput()
@@ -65,11 +66,40 @@ class CreateUserForm(forms.ModelForm):
         """Form meta data."""
 
         model = get_user_model()
-        fields: ClassVar[list[str]] = ["email", "password"]
+        fields: ClassVar[list[str]] = [
+            "first_name",
+            "last_name",
+            "email",
+            "password",
+        ]
 
-    def clean(self: Self) -> dict[str, Any]:
-        """Perform form validation."""
-        super().clean()
-        email = self.cleaned_data.get("email")
-        validate_email(email)
-        return self.cleaned_data
+
+class EditUserForm(forms.ModelForm):
+    """Create user form."""
+
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
+    email = forms.EmailField(required=True)
+    profile_image = forms.ImageField(required=False)
+
+    class Meta:
+        """Form meta data."""
+
+        model = get_user_model()
+        fields: ClassVar[list[str]] = [
+            "first_name",
+            "last_name",
+            "email",
+            "profile_image",
+        ]
+
+    def full_clean(self: Self) -> None:
+        """Perform full model validation."""
+        super().full_clean()
+        email = self.data.get("email")
+
+        # If user don't change email ignore error for user with this email already exist
+        if self.instance.email == email:
+            if "email" in self.errors:
+                del self.errors["email"]
+            self.cleaned_data["email"] = email
