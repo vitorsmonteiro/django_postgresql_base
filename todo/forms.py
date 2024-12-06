@@ -34,8 +34,10 @@ class TaskForm(forms.ModelForm):
 
     title = forms.CharField(required=True)
     description = forms.TextInput()
-    status = forms.ChoiceField(choices=TaskStatus.objects.all())
-    category = forms.ChoiceField(choices=TaskCategory.objects.all())
+    status = forms.ModelChoiceField(required=True, queryset=TaskStatus.objects.all())
+    category = forms.ModelChoiceField(
+        required=True, queryset=TaskCategory.objects.all()
+    )
 
     class Meta:
         """Form meta data."""

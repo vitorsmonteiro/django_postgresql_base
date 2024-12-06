@@ -16,7 +16,7 @@ def test_create_status() -> None:
 
 def test_create_category() -> None:
     """Test create TaskCategory."""
-    category = TaskStatus(name="Work")
+    category = TaskCategory(name="Work")
     category.save()
     assert len(TaskCategory.objects.all()) == 1
     assert TaskCategory.objects.all()[0] == category
@@ -36,5 +36,5 @@ def test_create_task(
         category=personal_category_fixture,
     )
     task.save()
-    assert len(task.objects.all()) == 1
-    assert task.objects.all()[0] == task
+    assert len(Task.objects.all()) == 1
+    assert Task.objects.all()[0] == task
