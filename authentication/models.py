@@ -7,12 +7,16 @@ from django.db import models
 class UserManager(BaseUserManager):
     """Custom User manager."""
 
-    def create_user(self: Self, email: str, password: str) -> AbstractBaseUser:
+    def create_user(
+        self: Self, email: str, password: str, first_name: str, last_name: str
+    ) -> AbstractBaseUser:
         """Create and saves a User with the given email and password.
 
         Args:
             email (str): Email
             password (str): Password.
+            first_name (str): First name.
+            last_name (str): Last name.
 
         Raises:
             ValueError: If email is empty
@@ -24,18 +28,26 @@ class UserManager(BaseUserManager):
             msg = "Users must have an email address."
             raise ValueError(msg)
 
-        user = self.model(email=self.normalize_email(email))
+        user = self.model(
+            email=self.normalize_email(email),
+            first_name=first_name,
+            last_name=last_name,
+        )
 
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self: Self, email: str, password: str) -> AbstractBaseUser:
+    def create_superuser(
+        self: Self, email: str, password: str, first_name: str, last_name: str
+    ) -> AbstractBaseUser:
         """Create and saves a superser with the given email and password.
 
         Args:
             email (str): Email
             password (str): Password.
+            first_name (str): First name.
+            last_name (str): Last name.
 
         Raises:
             ValueError: If email is empty
@@ -43,13 +55,9 @@ class UserManager(BaseUserManager):
         Returns:
             User: User instance.
         """
-        if not email:
-            msg = "Users must have an email address."
-            raise ValueError(msg)
-
-        user = self.model(email=self.normalize_email(email))
-
-        user.set_password(password)
+        user = self.create_user(
+            email=email, password=password, first_name=first_name, last_name=last_name
+        )
         user.is_staff = True
         user.is_superuser = True
         user.save()

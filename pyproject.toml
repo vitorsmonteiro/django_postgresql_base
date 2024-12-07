@@ -118,6 +118,7 @@ omit = [
     "__init__.py",
     "apps.py",
     "celery_worker.py",
+    "conftest.py",
 ]
 source = ["."]
 

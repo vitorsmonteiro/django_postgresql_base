@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from pathlib import Path
 
 import pytest
 from django.test.client import Client
@@ -188,14 +189,41 @@ class TestEditUserView:
             login_url, data={"email": user_fixture.email, "password": USER_PASSWORD}
         )
         url = reverse_lazy("authentication:edit_user")
-        data = {
-            "first_name": "foo",
-            "last_name": "bar",
-            "email": "foo@bar.com",
-            "password": "123456",
-        }
-        response = client.post(url, data=data)
+        path = Path.cwd()
+        path = (
+            path
+            / "authentication"
+            / "static"
+            / "authentication"
+            / "img"
+            / "blank_profile.jpg"
+        )
+        with path.open("rb") as img:
+            data = {
+                "first_name": "foo",
+                "last_name": "bar",
+                "email": "foo@bar.com",
+                "profile_image": img,
+            }
+            response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.FOUND
         assert user_fixture.first_name == data["first_name"]
         assert user_fixture.last_name == data["last_name"]
         assert user_fixture.email == data["email"]
+
+    @staticmethod
+    def test_post_view_nok(client: Client, user_fixture: User) -> None:
+        """Test post view invalid form."""
+        login_url = reverse_lazy("authentication:login")
+        client.post(
+            login_url, data={"email": user_fixture.email, "password": USER_PASSWORD}
+        )
+        url = reverse_lazy("authentication:edit_user")
+        data = {
+            "first_name": "foo",
+            "last_name": "bar",
+        }
+        response = client.post(url, data=data)
+        assert response.status_code == HTTPStatus.OK
+        assert "email: This field is required." in str(response.content)
+
