@@ -17,20 +17,5 @@
       },
       "django": true
     },
-    {
-      "name": "Python: Debug Tests",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "purpose": [
-        "debug-test",,
-      ],
-      "console": "integratedTerminal",
-      "justMyCode": true,
-      "envFile": "${workspaceFolder}/.env",
-      "env": {
-        "PYTEST_ADDOPTS": "--no-cov",,
-      }
-    },
   ],
 }
