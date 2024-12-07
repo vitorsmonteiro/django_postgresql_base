@@ -226,4 +226,3 @@ class TestEditUserView:
         response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.OK
         assert "email: This field is required." in str(response.content)
-

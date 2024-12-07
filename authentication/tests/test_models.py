@@ -40,7 +40,6 @@ class TestUserManager:
                 password="123456",  # noqa: S106
             )
 
-
     @staticmethod
     def test_create_superuser() -> None:
         """Test superuser creation with UserManager."""
