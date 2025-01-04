@@ -26,6 +26,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("common.urls")),
     path("", include("authentication.urls")),
+    path("todo", include("todo.urls")),
 ]
 
 if not settings.TESTING:
