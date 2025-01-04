@@ -5,7 +5,7 @@
             {% for field, error in errors.items %}<li>{{ field }}: {{ error.0 }}</li>{% endfor %}
         </ul>
     {% endif %}
-    <div class="input-group center">
+    <div class="input-group justify-content-center">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="input-group mb-3">
@@ -28,7 +28,7 @@
                 <span class="input-group-text" id="basic-addon1">Password</span>
                 <input type="password" name="password" class="form-control" required />
             </div>
-            <input type="submit" value="Create" class="btn btn-primary" />
+            <input type="submit" value="Create" class="btn btn-dark" />
         </form>
     </div>
 {% endblock content %}

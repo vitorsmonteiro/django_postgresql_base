@@ -1,47 +1,41 @@
-{% extends "common/base.html" %} {% block content %} {% if errors %}
-<ul>
-  {% for field, error in errors.items %}
-  <li>{{ field }}: {{ error.0 }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-<div class="input-group center">
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">First Name</span>
-      <input
-        type="text"
-        name="first_name"
-        class="form-control"
-        value="{{user.first_name}}"
-        required
-      />
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Last Name</span>
-      <input
-        type="text"
-        name="last_name"
-        class="form-control"
-        value="{{user.last_name}}"
-        required
-      />
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Email</span>
-      <input
-        type="email"
-        name="email"
-        value="{{user.email}}"
-        class="form-control"
-      />
-    </div>
-    <div class="input-group mb-3">
-      <span class="input-group-text" id="basic-addon1">Profile image</span>
-      <input type="file" name="profile_image" class="form-control" />
-    </div>
-    <input type="submit" value="Save" class="btn btn-primary" />
-  </form>
-</div>
+{% extends "common/base.html" %}
+{% block content %}
+  {% if errors %}
+    <ul>
+      {% for field, error in errors.items %}<li>{{ field }}: {{ error.0 }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  <div class="input-group justify-content-center">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">First Name</span>
+        <input type="text"
+               name="first_name"
+               class="form-control"
+               value="{{ user.first_name }}"
+               required />
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Last Name</span>
+        <input type="text"
+               name="last_name"
+               class="form-control"
+               value="{{ user.last_name }}"
+               required />
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Email</span>
+        <input type="email"
+               name="email"
+               value="{{ user.email }}"
+               class="form-control" />
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Profile image</span>
+        <input type="file" name="profile_image" class="form-control" />
+      </div>
+      <input type="submit" value="Save" class="btn btn-dark" />
+    </form>
+  </div>
 {% endblock content %}
