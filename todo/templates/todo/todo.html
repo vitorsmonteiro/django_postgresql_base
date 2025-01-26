@@ -3,5 +3,12 @@
     Todo
 {% endblock title %}
 {% block content %}
-    <h1>Todo</h1>
+    <h1>{{ user.first_name }} task list</h1>
+    {% if tasks %}
+        <ul>
+            {% for task in tasks %}<li>{{ task.task }}</li>{% endfor %}
+        </ul>
+    {% else %}
+        <p>You are free, enjoy!</p>
+    {% endif %}
 {% endblock content %}
