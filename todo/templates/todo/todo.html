@@ -4,6 +4,12 @@
 {% endblock title %}
 {% block content %}
     <h1>{{ user.first_name }} task list</h1>
+    <button hx-get="{% url 'todo:todo_create' %}"
+            hx-target="#create-modal"
+            hx-trigger="click"
+            data-bs-toggle="modal"
+            data-bs-target="#create-modal"
+            class="btn btn-primary">Add task</button>
     {% if tasks %}
         <ul>
             {% for task in tasks %}<li>{{ task.task }}</li>{% endfor %}
@@ -11,4 +17,12 @@
     {% else %}
         <p>You are free, enjoy!</p>
     {% endif %}
+    <div id="create-modal"
+         class="modal modal-blur fade"
+         aria-hidden="false"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content"></div>
+        </div>
+    </div>
 {% endblock content %}
