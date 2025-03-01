@@ -4,7 +4,7 @@
             <h5 class="modal-title">Create a new task</h5>
         </div>
         <div class="modal-body">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" action="{% url 'todo:todo_create' %}">
                 {% csrf_token %}
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon1">Title</span>

@@ -10,6 +10,11 @@ class TaskCategory(models.Model):
 
     name = models.CharField(max_length=50, blank=False)
 
+    class Meta:
+        """Model meta data."""
+
+        verbose_name_plural = "categories"
+
     def __str__(self: Self) -> str:
         """String representation."""
         return f"Category: {self.name}"
@@ -19,6 +24,11 @@ class TaskStatus(models.Model):
     """Task status model."""
 
     name = models.CharField(max_length=50, blank=False)
+
+    class Meta:
+        """Model meta data."""
+
+        verbose_name_plural = "statuses"
 
     def __str__(self: Self) -> str:
         """String representation."""

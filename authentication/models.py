@@ -1,6 +1,10 @@
 from typing import ClassVar, Self
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 
 
@@ -64,7 +68,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     """Custom User Model."""
 
     first_name = models.CharField(max_length=30)
@@ -78,7 +82,7 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, blank=True)
     is_superuser = models.BooleanField(default=False, blank=True)
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS: ClassVar[list[str]] = []
+    REQUIRED_FIELDS: ClassVar[list[str]] = ["first_name", "last_name"]
 
     def __str__(self: Self) -> str:
         """String representation."""

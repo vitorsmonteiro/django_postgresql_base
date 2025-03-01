@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
 from todo.forms import TaskForm
 from todo.models import Task, TaskCategory, TaskStatus
@@ -14,7 +15,7 @@ def home(request: HttpRequest) -> HttpResponse:
     Returns:
         HttpResponse: HttpResponse object
     """
-    tasks = Task.objects.all()
+    tasks = Task.objects.filter(created_by=request.user)
     context = {"tasks": tasks}
 
     return render(request=request, template_name="todo/todo.html", context=context)
@@ -38,8 +39,10 @@ def create_todo(request: HttpRequest) -> HttpResponse:
         )
     form = TaskForm(request.POST)
     if form.is_valid():
-        form.save()
-        return HttpResponse("Task created successfully!")
+        task = form.save()
+        task.created_by = request.user
+        task.save()
+        return redirect(to=reverse_lazy("todo:home"))
     context = {"form": form}
     return render(
         request=request, template_name="todo/todo_create.html", context=context

@@ -10,13 +10,15 @@
             data-bs-toggle="modal"
             data-bs-target="#create-modal"
             class="btn btn-primary">Add task</button>
-    {% if tasks %}
-        <ul>
-            {% for task in tasks %}<li>{{ task.task }}</li>{% endfor %}
-        </ul>
-    {% else %}
-        <p>You are free, enjoy!</p>
-    {% endif %}
+    <div class="container mt-3">
+        {% if tasks %}
+            <ul>
+                {% for task in tasks %}<li>{{ task.title }}</li>{% endfor %}
+            </ul>
+        {% else %}
+            <p>You are free, enjoy!</p>
+        {% endif %}
+    </div>
     <div id="create-modal"
          class="modal modal-blur fade"
          aria-hidden="false"
