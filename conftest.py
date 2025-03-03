@@ -1,7 +1,7 @@
 import pytest
 
 from authentication.models import User
-from todo.models import Task, TaskCategory, TaskStatus
+from todo.models import Task
 
 pytestmark = pytest.mark.django_db
 
@@ -21,58 +21,13 @@ def user_fixture() -> User:
 
 
 @pytest.fixture
-def todo_status_fixture() -> TaskStatus:
-    """Todo status fixture."""
-    status = TaskStatus(name="Todo")
-    status.save()
-    return status
-
-
-@pytest.fixture
-def in_progress_status_fixture() -> TaskStatus:
-    """In progress status fixture."""
-    status = TaskStatus(name="In Progress")
-    status.save()
-    return status
-
-
-@pytest.fixture
-def done_status_fixture() -> TaskStatus:
-    """Done status fixture."""
-    status = TaskStatus(name="Done")
-    status.save()
-    return status
-
-
-@pytest.fixture
-def personal_category_fixture() -> TaskCategory:
-    """Personal category fixture."""
-    category = TaskCategory(name="Personal")
-    category.save()
-    return category
-
-
-@pytest.fixture
-def work_category_fixture() -> TaskCategory:
-    """Work category fixture."""
-    category = TaskCategory(name="Work")
-    category.save()
-    return category
-
-
-@pytest.fixture
-def task_fixture(
-    user_fixture: User,
-    todo_status_fixture: TaskStatus,
-    personal_category_fixture: TaskCategory,
-) -> Task:
+def task_fixture(user_fixture: User) -> Task:
     """Task fixture."""
     task = Task(
         title="Fixture task",
         description="Test fixture",
         created_by=user_fixture,
-        status=todo_status_fixture,
-        category=personal_category_fixture,
+        status=Task.STATUS_CHOICES["new"],
     )
     task.save()
     return task

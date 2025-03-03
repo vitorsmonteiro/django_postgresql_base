@@ -1,0 +1,30 @@
+{% extends "common/base.html" %}
+{% block content %}
+    {% if errors %}
+        {% for error in errors %}<p>{{ error }}</p>{% endfor %}
+    {% endif %}
+    <div class="modal-body">
+        <form method="post"
+              enctype="multipart/form-data"
+              action="{% url 'todo:task_create' %}">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Title</span>
+                <input type="text" name="title" class="form-control" required />
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Status</label>
+                <select name="status" class="form-control" required>
+                    {% for status in form.fields.status.choices %}<option value="{{ status.0 }}">{{ status.1 }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon2">Description</span>
+                <textarea name="description"
+                          class="form-control"
+                          rows="5""></textarea>
+            </div>
+            <input type="submit" value="Create" class="btn btn-primary">
+        </form>
+    </div>
+{% endblock content %}

@@ -103,6 +103,10 @@ docstring-code-format = true
 # enabled.
 docstring-code-line-length = 88
 
+# Use google docstring format.
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 # Make parenthesis not required for fixtures
 [tool.ruff.lint.flake8-pytest-style]
 fixture-parentheses = false

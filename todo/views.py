@@ -1,49 +1,55 @@
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from typing import Self
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import QuerySet
 from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from todo.forms import TaskForm
-from todo.models import Task, TaskCategory, TaskStatus
+from todo.models import Task
 
 
-def home(request: HttpRequest) -> HttpResponse:
-    """Todo home view.
+class TaskList(LoginRequiredMixin, ListView):
+    """Task generic list view."""
 
-    Args:
-        request (HttpRequest): HttpRequest object
+    model = Task
+    template_name = "todo/task_list.html"
+    context_object_name = "tasks"
 
-    Returns:
-        HttpResponse: HttpResponse object
-    """
-    tasks = Task.objects.filter(created_by=request.user)
-    context = {"tasks": tasks}
+    def get_queryset(self: Self) -> QuerySet:
+        """Get filtered query set.
 
-    return render(request=request, template_name="todo/todo.html", context=context)
+        Returns:
+            QuerySet: Task queryset.
+        """
+        query_set = Task.objects.filter(created_by=self.request.user)
+        query_set = query_set.order_by("created_at")
+        return super().get_queryset()
 
 
-def create_todo(request: HttpRequest) -> HttpResponse:
-    """Create todo view.
+class TaskCreate(LoginRequiredMixin, CreateView):
+    """Task generic create view."""
 
-    Args:
-        request (HttpRequest): HttpRequest object
+    model = Task
+    template_name = "todo/task_create.html"
+    form_class = TaskForm
+    success_url = reverse_lazy("todo:home")
 
-    Returns:
-        HttpResponse: HttpResponse object
-    """
-    if request.method == "GET":
-        statuses = TaskStatus.objects.all()
-        categories = TaskCategory.objects.all()
-        context = {"statuses": statuses, "categories": categories}
-        return render(
-            request=request, template_name="todo/todo_create.html", context=context
-        )
-    form = TaskForm(request.POST)
-    if form.is_valid():
-        task = form.save()
-        task.created_by = request.user
-        task.save()
-        return redirect(to=reverse_lazy("todo:home"))
-    context = {"form": form}
-    return render(
-        request=request, template_name="todo/todo_create.html", context=context
-    )
+
+class TaskUpdate(LoginRequiredMixin, UpdateView):
+    """Task generic update view."""
+
+    model = Task
+    template_name = "todo/task_update.html"
+    form_class = TaskForm
+    success_url = reverse_lazy("todo:home")
+    context_object_name = "task"
+
+
+class TaskDelete(LoginRequiredMixin, DeleteView):
+    """Task generic delete view."""
+
+    model = Task
+    template_name = "todo/task_confirm_delete.html"
+    success_url = reverse_lazy("todo:home")
+    context_object_name = "task"
