@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from todo.models import Task, TaskCategory, TaskStatus
+from todo.models import Task
 
-admin.register(Task)
-admin.register(TaskCategory)
-admin.register(TaskStatus)
+admin.site.register(Task)
