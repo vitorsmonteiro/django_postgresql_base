@@ -9,15 +9,41 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Status</th>
+                        <th scope="col">
+                            <select class="form-select"
+                                    name="status"
+                                    hx-get="{% url 'todo:task_list' %}"
+                                    hx-include="[status='status']"
+                                    hx-trigger="change"
+                                    hx-target="#todo-table">
+                                <option selected value="">Status</option>
+                                <option value="new">New</option>
+                                <option value="in progress">In progress</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </th>
                         <th scope="col">Title</th>
                         <th scope="col">Description</th>
-                        <th scope="col">Created at</th>
+                        <th scope="col">
+                            <select class="form-select"
+                                    name="sort"
+                                    hx-get="{% url 'todo:task_list' %}"
+                                    hx-include="[sort='sort']"
+                                    hx-trigger="change"
+                                    hx-target="#todo-table">
+                                <option selected value="">Created at</option>
+                                <option value="+created_at">Oldest first</option>
+                                <option value="-created_at">Newest first</option>
+                            </select>
+                        </th>
                         <th scope="col"></th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
-                {% include "todo/components/task_table.html" %}
+                <tbody id="todo-table">
+                    status
+                    {% include "todo/components/task_table.html" %}
+                </tbody>
             </table>
         {% else %}
             <p>You are free, enjoy!</p>
