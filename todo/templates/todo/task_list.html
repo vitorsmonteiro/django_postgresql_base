@@ -5,27 +5,10 @@
 {% block content %}
     <h1>{{ request.user.first_name }} task list</h1>
     <div class="container mt-3">
-        {% if tasks %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Status</th>
-                        <th scope="col">Title</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Created at</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                {% include "todo/components/task_table.html" %}
-            </table>
+        {% if page_obj %}
+            {% include "todo/components/task_table.html" %}
         {% else %}
             <p>You are free, enjoy!</p>
         {% endif %}
-    </div>
-    <div class="container">
-        <a href="{% url 'todo:task_create' %}">
-            <button class="btn btn-primary">Add task</button>
-        </a>
     </div>
 {% endblock content %}
