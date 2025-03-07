@@ -2,12 +2,20 @@ from typing import Self
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
+from main_project.settings import PAGINATION_SIZE
 from todo.forms import TaskForm
 from todo.models import Task
 
@@ -24,7 +32,9 @@ def home(request: HttpRequest) -> HttpResponse:
     """
     tasks = Task.objects.filter(created_by=request.user)
     tasks = tasks.order_by("created_at")
-    context = {"tasks": tasks}
+    paginator = Paginator(tasks, PAGINATION_SIZE)
+    page_obj = paginator.get_page(1)
+    context = {"page_obj": page_obj}
     return render(request=request, template_name="todo/task_list.html", context=context)
 
 
@@ -34,6 +44,8 @@ class TaskList(LoginRequiredMixin, ListView):
     model = Task
     template_name = "todo/components/task_table.html"
     context_object_name = "tasks"
+    paginate_by = PAGINATION_SIZE
+    ordering = "created_at"
 
     def get_queryset(self: Self) -> QuerySet:
         """Get filtered query set.
@@ -41,12 +53,12 @@ class TaskList(LoginRequiredMixin, ListView):
         Returns:
             QuerySet: Task queryset.
         """
-        query_set = Task.objects.filter(created_by=self.request.user)
-        if sort := self.request.GET.get("sort"):
+        query_set = super().get_queryset()
+        query_set = query_set.filter(created_by=self.request.user)
+        if sort := self.request.GET.get("sort", ""):
             query_set = query_set.order_by(sort)
-        for item in self.request.GET.items():
-            if item[1] and item[0] != "sort":
-                query_set = query_set.filter(item)
+        if status := self.request.GET.get("status", ""):
+            query_set = query_set.filter(status=status)
         return query_set
 
 
@@ -89,4 +101,12 @@ class TaskDelete(LoginRequiredMixin, DeleteView):
     model = Task
     template_name = "todo/task_confirm_delete.html"
     success_url = reverse_lazy("todo:home")
+    context_object_name = "task"
+
+
+class TaskDetail(LoginRequiredMixin, DetailView):
+    """Task generic detail view."""
+
+    model = Task
+    template_name = "todo/task_detail.html"
     context_object_name = "task"

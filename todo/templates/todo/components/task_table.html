@@ -1,14 +1,71 @@
-{% for task in tasks %}
-    <tr>
-        <td>{{ task.get_status_display }}</td>
-        <td>{{ task.title }}</td>
-        <td>{{ task.description }}</td>
-        <td>{{ task.created_at }}</td>
-        <td>
-            <a href="{% url 'todo:task_update' task.id %}"><i class="fa-solid fa-pen-to-square"></i></a>
-        </td>
-        <td>
-            <a href="{% url 'todo:task_delete' task.id %}"><i class="fa-solid fa-trash text-danger"></i></a>
-        </td>
-    </tr>
-{% endfor %}
+<div class="container" id="todo-result">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">
+                    <select class="form-select"
+                            name="status"
+                            hx-get="{% url 'todo:task_list' %}"
+                            hx-include="[name='sort']"
+                            hx-trigger="change"
+                            hx-target="#todo-result">
+                        <option {% if not request.GET.status %}selected{% endif %} value="">Status</option>
+                        <option value="new" {% if request.GET.status == "new" %}selected{% endif %}>New</option>
+                        <option value="in progress"
+                                {% if request.GET.status == "in progress" %}selected{% endif %}>In progress</option>
+                        <option value="done" {% if request.GET.status == "done" %}selected{% endif %}>Done</option>
+                    </select>
+                </th>
+                <th scope="col">
+                    <select class="form-select"
+                            name="sort"
+                            hx-get="{% url 'todo:task_list' %}"
+                            hx-include="[name='status']"
+                            hx-trigger="change"
+                            hx-target="#todo-result">
+                        <option selected value="" {% if not request.GET.sort %}selected{% endif %}>Created at</option>
+                        <option value="created_at"
+                                {% if request.GET.sort == "created_at" %}selected{% endif %}>Oldest first</option>
+                        <option value="-created_at"
+                                {% if request.GET.sort == "-created_at" %}selected{% endif %}>Newest first</option>
+                    </select>
+                </th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in page_obj %}
+                <tr>
+                    <td>
+                        <a href="{% url 'todo:task_detail' task.id %}">{{ task.title }}</a>
+                    </td>
+                    <td>{{ task.description }}</td>
+                    <td>{{ task.get_status_display }}</td>
+                    <td>{{ task.created_at }}</td>
+                    <td>
+                        <a href="{% url 'todo:task_update' task.id %}"><i class="fa-solid fa-pen-to-square"></i></a>
+                    </td>
+                    <td>
+                        <a href="{% url 'todo:task_delete' task.id %}"><i class="fa-solid fa-trash text-danger"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                    <a href="{% url 'todo:task_create' %}">
+                        <button class="btn btn-primary">Add task</button>
+                    </a>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    {% include "todo/components/task_pagination.html" %}
+</div>

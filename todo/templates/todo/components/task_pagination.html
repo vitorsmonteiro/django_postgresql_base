@@ -1,0 +1,36 @@
+<div class="container">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="{% url 'todo:task_list' %}?{{ request.GET.urlencode }}&page=1"
+                       hx-target="#todo-result">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="{% url 'todo:task_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}"
+                       hx-target="#todo-result">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item">
+                <a class="page-link"
+                   hx-get="{% url 'todo:task_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.number }}"
+                   hx-target="#todo-result">{{ page_obj.number }}</a>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="{% url 'todo:task_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}"
+                       hx-target="#todo-result">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link"
+                       hx-get="{% url 'todo:task_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.paginator.num_pages }}"
+                       hx-target="#todo-result">Last</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+</div>

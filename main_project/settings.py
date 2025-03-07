@@ -171,7 +171,7 @@ if not TESTING:
     ]
 
 # Common settings
-PAGINATION_SIZE = 20
+PAGINATION_SIZE = 5
 
 # Replace default user model
 AUTH_USER_MODEL = "authentication.User"
