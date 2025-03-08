@@ -11,4 +11,5 @@ urlpatterns = [
     path("edit_user", views.edit_user, name="edit_user"),
     path("reset_password", views.reset_password, name="reset_password"),
     path("delete_account", views.delete_account, name="delete_account"),
+    path("generate_token", views.generate_token, name="generate_token"),
 ]

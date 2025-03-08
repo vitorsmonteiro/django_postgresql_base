@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.files.uploadedfile import UploadedFile  # noqa: TCH002
@@ -143,3 +145,24 @@ def edit_user(request: HttpRequest) -> HttpResponse:
         user.save()
         return redirect(HOME)
     return render(request, "authentication/edit_user.html", {"errors": form.errors})
+
+
+@login_required
+def generate_token(request: HttpRequest) -> HttpResponse:
+    """Generate a token for user.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    user: User = request.user
+    token = str(uuid4())
+    user.token = token
+    user.save()
+    return render(
+        request=request,
+        template_name="authentication/generate_token.html",
+        context={"token": token},
+    )
