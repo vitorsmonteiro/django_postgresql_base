@@ -65,7 +65,7 @@ def detail_task(request: HttpRequest, task_id: int) -> HttpResponse:  # noqa: AR
 
 
 @router.put("/task/{task_id}", response=TaskOut)
-def update_task(request: HttpRequest,  task_id: int, payload: TaskIn) -> HttpResponse:  # noqa: ARG001
+def update_task(request: HttpRequest, task_id: int, payload: TaskIn) -> HttpResponse:  # noqa: ARG001
     """Update task API.
 
     Args:
