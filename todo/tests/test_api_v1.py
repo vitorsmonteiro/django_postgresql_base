@@ -52,6 +52,21 @@ class TestListAPI:
         assert response.json() == expected
 
     @staticmethod
+    def test_list_api_qith_status_query(client: Client, user_fixture: User) -> None:
+        """Test list api with different user."""
+        url = reverse_lazy("api-1.0.0:task_list")
+        response = client.get(
+            url,
+            headers={"Authorization": f"Bearer {user_fixture.token}"},
+            query_params={"status": "foo"},
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {
+            "items": [],
+            "count": len(Task.objects.filter(created_by=user_fixture, status="foo")),
+        }
+
+    @staticmethod
     def test_list_api_different_user(client: Client, user_fixture2: User) -> None:
         """Test list api with different user."""
         url = reverse_lazy("api-1.0.0:task_list")

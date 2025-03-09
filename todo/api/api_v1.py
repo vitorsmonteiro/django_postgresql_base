@@ -70,10 +70,24 @@ class Message(Schema):
 
 @router.get("/task", response=list[TaskOut], url_name="task_list")
 @paginate()
-def list_taks(request: HttpRequest) -> HttpResponse:
-    """List tasks of the user."""
+def list_taks(
+    request: HttpRequest, sort: str = "created_at", status: str | None = None
+) -> HttpResponse:
+    """List API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        sort (str, optional): Sort list by sort value. Defaults to "created_at".
+        status (str | None, optional): Filter by status. Defaults to None.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
     query_set = Task.objects.filter(created_by=request.user)
-    return query_set.order_by("id")
+    query_set = query_set.order_by(sort)
+    if status:
+        query_set = query_set.filter(status=status)
+    return query_set
 
 
 @router.post(
