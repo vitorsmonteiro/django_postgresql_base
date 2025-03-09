@@ -1,12 +1,11 @@
 from datetime import datetime
 from http import HTTPStatus
 
-from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from ninja import Field, Router, Schema
+from pydantic import field_validator
 
-from todo.forms import TaskForm
 from todo.models import Task
 
 router = Router()
@@ -27,9 +26,45 @@ class TaskOut(Schema):
 class TaskIn(Schema):
     """Task API Input schema."""
 
+    title: str
+    description: str
+    status: str
+
+    @field_validator("status")
+    @staticmethod
+    def validate_status(status: str) -> str:
+        """Validate status against possible options.
+
+        Args:
+            status (str): Status value
+
+        Raises:
+            ValueError: Raised if status is not valid
+
+        Returns:
+            str: Status value
+        """
+        choices = Task.STATUS_CHOICES.keys()
+        if status not in choices:
+            msg = (
+                f"'{status}' is not a valid status. Valid options: {", ".join(choices)}"
+            )
+            raise ValueError(msg)
+        return status
+
+
+class TaskInPatch(TaskIn):
+    """Task Patch API Input schema."""
+
     title: str = ""
     description: str = ""
-    status: str = "new"
+    status: str = ""
+
+
+class Message(Schema):
+    """Generic schema for messages."""
+
+    message: str
 
 
 @router.get("/task", response=list[TaskOut], url_name="task_list")
@@ -39,19 +74,27 @@ def list_taks(request: HttpRequest) -> HttpResponse:
     return query_set.order_by("id")
 
 
-@router.post("/task", url_name="task_create")
+@router.post(
+    "/task",
+    url_name="task_create",
+    response={HTTPStatus.OK: TaskOut, HTTPStatus.BAD_REQUEST: Message},
+)
 def create_task(request: HttpRequest, payload: TaskIn) -> HttpResponse:
     """Create task API."""
-    form = TaskForm(data=payload.dict())
-    if form.is_valid():
-        task: Task = form.save(commit=False)
-        task.created_by = request.user
-        task.save()
-        return {"id": task.pk}
-    return JsonResponse(data=form.errors, status=HTTPStatus.BAD_REQUEST)
+    task = Task.objects.create(
+        title=payload.title,
+        description=payload.description,
+        status=payload.status,
+        created_by=request.user,
+    )
+    return HTTPStatus.OK, task
 
 
-@router.get("/task/{task_id}", response=TaskOut, url_name="task_detail")
+@router.get(
+    "/task/{task_id}",
+    response={HTTPStatus.OK: TaskOut, HTTPStatus.FORBIDDEN: Message},
+    url_name="task_detail",
+)
 def detail_task(request: HttpRequest, task_id: int) -> HttpResponse:
     """Get task detail API.
 
@@ -64,11 +107,21 @@ def detail_task(request: HttpRequest, task_id: int) -> HttpResponse:
     """
     task = get_object_or_404(Task, pk=task_id)
     if task.created_by != request.user:
-        raise PermissionDenied
-    return task
+        return HTTPStatus.FORBIDDEN, {
+            "message": "User does not have acces to resource."
+        }
+    return HTTPStatus.OK, task
 
 
-@router.put("/task/{task_id}", response=TaskOut, url_name="task_update")
+@router.put(
+    "/task/{task_id}",
+    response={
+        HTTPStatus.OK: TaskOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.FORBIDDEN: Message,
+    },
+    url_name="task_update",
+)
 def update_task(request: HttpRequest, task_id: int, payload: TaskIn) -> HttpResponse:
     """Update task API.
 
@@ -82,14 +135,51 @@ def update_task(request: HttpRequest, task_id: int, payload: TaskIn) -> HttpResp
     """
     task = get_object_or_404(Task, id=task_id)
     if task.created_by != request.user:
-        raise PermissionDenied
+        return HTTPStatus.FORBIDDEN, {
+            "message": "User does not have acces to resource."
+        }
+    task.title = payload.title
+    task.description = payload.description
+    task.status = payload.status
+    task.save()
+    task.refresh_from_db()
+    return HTTPStatus.OK, task
+
+
+@router.patch(
+    "/task/{task_id}",
+    response={HTTPStatus.OK: TaskOut, HTTPStatus.FORBIDDEN: Message},
+    url_name="task_patch",
+)
+def patch_task(
+    request: HttpRequest, task_id: int, payload: TaskInPatch
+) -> HttpResponse:
+    """Ptach task API.
+
+    Args:
+        request (HttpRequest): HttpRequest object
+        task_id (int): Task Id
+        payload (TaskIn): TaskIn object
+
+    Returns:
+        HttpResponse: HttpResponse object
+    """
+    task = get_object_or_404(Task, id=task_id)
+    if task.created_by != request.user:
+        return HTTPStatus.FORBIDDEN, {
+            "message": "User does not have acces to resource."
+        }
     for attr, value in payload.dict(exclude_unset=True).items():
         setattr(task, attr, value)
     task.save()
-    return task
+    return HTTPStatus.OK, task
 
 
-@router.delete("/task/{task_id}", url_name="task_delete")
+@router.delete(
+    "/task/{task_id}",
+    url_name="task_delete",
+    response={HTTPStatus.OK: Message, HTTPStatus.FORBIDDEN: Message},
+)
 def delete_task(request: HttpRequest, task_id: int) -> HttpResponse:
     """Delete task API.
 
@@ -102,6 +192,8 @@ def delete_task(request: HttpRequest, task_id: int) -> HttpResponse:
     """
     task = get_object_or_404(Task, id=task_id)
     if task.created_by != request.user:
-        raise PermissionDenied
+        return HTTPStatus.FORBIDDEN, {
+            "message": "User does not have acces to resource."
+        }
     task.delete()
-    return {"success": True}
+    return HTTPStatus.OK, {"message": "success"}
