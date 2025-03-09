@@ -1,8 +1,9 @@
+from datetime import datetime
 from http import HTTPStatus
 
+from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from django.utils.timezone import datetime
 from ninja import Field, Router, Schema
 
 from todo.forms import TaskForm
@@ -31,14 +32,14 @@ class TaskIn(Schema):
     status: str = "new"
 
 
-@router.get("/task", response=list[TaskOut])
+@router.get("/task", response=list[TaskOut], url_name="task_list")
 def list_taks(request: HttpRequest) -> HttpResponse:
     """List tasks of the user."""
     query_set = Task.objects.filter(created_by=request.user)
     return query_set.order_by("id")
 
 
-@router.post("/task")
+@router.post("/task", url_name="task_create")
 def create_task(request: HttpRequest, payload: TaskIn) -> HttpResponse:
     """Create task API."""
     form = TaskForm(data=payload.dict())
@@ -47,11 +48,11 @@ def create_task(request: HttpRequest, payload: TaskIn) -> HttpResponse:
         task.created_by = request.user
         task.save()
         return {"id": task.pk}
-    return JsonResponse(data={"error": form.errors}, status=HTTPStatus.BAD_REQUEST)
+    return JsonResponse(data=form.errors, status=HTTPStatus.BAD_REQUEST)
 
 
-@router.get("/task/{task_id}", response=TaskOut)
-def detail_task(request: HttpRequest, task_id: int) -> HttpResponse:  # noqa: ARG001
+@router.get("/task/{task_id}", response=TaskOut, url_name="task_detail")
+def detail_task(request: HttpRequest, task_id: int) -> HttpResponse:
     """Get task detail API.
 
     Args:
@@ -61,11 +62,14 @@ def detail_task(request: HttpRequest, task_id: int) -> HttpResponse:  # noqa: AR
     Returns:
         HttpResponse: HttpResponse object containing task detail..
     """
-    return get_object_or_404(Task, pk=task_id)
+    task = get_object_or_404(Task, pk=task_id)
+    if task.created_by != request.user:
+        raise PermissionDenied
+    return task
 
 
-@router.put("/task/{task_id}", response=TaskOut)
-def update_task(request: HttpRequest, task_id: int, payload: TaskIn) -> HttpResponse:  # noqa: ARG001
+@router.put("/task/{task_id}", response=TaskOut, url_name="task_update")
+def update_task(request: HttpRequest, task_id: int, payload: TaskIn) -> HttpResponse:
     """Update task API.
 
     Args:
@@ -77,14 +81,16 @@ def update_task(request: HttpRequest, task_id: int, payload: TaskIn) -> HttpResp
         HttpResponse: HttpResponse object
     """
     task = get_object_or_404(Task, id=task_id)
+    if task.created_by != request.user:
+        raise PermissionDenied
     for attr, value in payload.dict(exclude_unset=True).items():
         setattr(task, attr, value)
     task.save()
     return task
 
 
-@router.delete("/task/{task_id}")
-def delete_task(request: HttpRequest, task_id: int) -> HttpResponse:  # noqa: ARG001
+@router.delete("/task/{task_id}", url_name="task_delete")
+def delete_task(request: HttpRequest, task_id: int) -> HttpResponse:
     """Delete task API.
 
     Args:
@@ -95,5 +101,7 @@ def delete_task(request: HttpRequest, task_id: int) -> HttpResponse:  # noqa: AR
         HttpResponse: HttpResponse object
     """
     task = get_object_or_404(Task, id=task_id)
+    if task.created_by != request.user:
+        raise PermissionDenied
     task.delete()
     return {"success": True}

@@ -21,6 +21,7 @@ fontawesomefree = "^6.6.0"
 django-simple-history = "^3.7.0"
 pillow = "^11.0.0"
 django-ninja = "^1.3.0"
+pytest-xdist = "^3.6.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.0"
@@ -129,7 +130,7 @@ source = ["."]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "main_project.settings"
-addopts = "-p no:warnings --create-db -v --cov"
+addopts = "-p no:warnings --create-db -v --cov -n 4"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 
 [tool.coverage.report]

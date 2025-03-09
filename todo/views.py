@@ -1,7 +1,7 @@
 from typing import Self
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse
@@ -85,7 +85,7 @@ class TaskCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class TaskUpdate(LoginRequiredMixin, UpdateView):
+class TaskUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Task generic update view."""
 
     model = Task
@@ -94,8 +94,13 @@ class TaskUpdate(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("todo:home")
     context_object_name = "task"
 
+    def test_func(self: Self) -> bool:
+        """Test if user can update a task."""
+        task: Task = self.get_object()
+        return self.request.user == task.created_by
 
-class TaskDelete(LoginRequiredMixin, DeleteView):
+
+class TaskDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Task generic delete view."""
 
     model = Task
@@ -103,10 +108,20 @@ class TaskDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("todo:home")
     context_object_name = "task"
 
+    def test_func(self: Self) -> bool:
+        """Test if user can update a task."""
+        task: Task = self.get_object()
+        return self.request.user == task.created_by
 
-class TaskDetail(LoginRequiredMixin, DetailView):
+
+class TaskDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     """Task generic detail view."""
 
     model = Task
     template_name = "todo/task_detail.html"
     context_object_name = "task"
+
+    def test_func(self: Self) -> bool:
+        """Test if user can update a task."""
+        task: Task = self.get_object()
+        return self.request.user == task.created_by

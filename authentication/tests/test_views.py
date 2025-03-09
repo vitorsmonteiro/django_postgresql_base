@@ -234,6 +234,9 @@ class TestGenerateTokenView:
     @staticmethod
     def test_token_generation(client: Client, user_fixture: User) -> None:
         """Test generation of a new token."""
+        user_fixture.token = ""
+        user_fixture.save()
+        user_fixture.refresh_from_db()
         assert user_fixture.token == ""
         login_url = reverse_lazy("authentication:login")
         client.post(
