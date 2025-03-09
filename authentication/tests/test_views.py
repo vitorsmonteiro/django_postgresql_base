@@ -226,3 +226,24 @@ class TestEditUserView:
         response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.OK
         assert "email: This field is required." in str(response.content)
+
+
+class TestGenerateTokenView:
+    """Tests for generate_token view."""
+
+    @staticmethod
+    def test_token_generation(client: Client, user_fixture: User) -> None:
+        """Test generation of a new token."""
+        user_fixture.token = ""
+        user_fixture.save()
+        user_fixture.refresh_from_db()
+        assert user_fixture.token == ""
+        login_url = reverse_lazy("authentication:login")
+        client.post(
+            login_url, data={"email": user_fixture.email, "password": USER_PASSWORD}
+        )
+        url = reverse_lazy("authentication:generate_token")
+        response = client.get(url)
+        user_fixture.refresh_from_db()
+        assert response.status_code == HTTPStatus.OK
+        assert user_fixture.token != ""

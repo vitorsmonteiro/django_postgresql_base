@@ -78,6 +78,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         upload_to="static/authentication/img/",
         default="static/authentication/img/blank_profile.jpg",
     )
+    token = models.CharField(max_length=50, blank=True, null=False)
     objects = UserManager()
     is_staff = models.BooleanField(default=False, blank=True)
     is_superuser = models.BooleanField(default=False, blank=True)

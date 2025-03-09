@@ -4,11 +4,5 @@
 {% endblock title %}
 {% block content %}
     <h1>{{ request.user.first_name }} task list</h1>
-    <div class="container mt-3">
-        {% if page_obj %}
-            {% include "todo/components/task_table.html" %}
-        {% else %}
-            <p>You are free, enjoy!</p>
-        {% endif %}
-    </div>
+    <div class="container mt-3">{% include "todo/components/task_table.html" %}</div>
 {% endblock content %}
