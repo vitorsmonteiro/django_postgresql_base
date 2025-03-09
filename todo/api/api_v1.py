@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from ninja import Field, Router, Schema
+from ninja.pagination import paginate
 from pydantic import field_validator
 
 from todo.models import Task
@@ -68,6 +69,7 @@ class Message(Schema):
 
 
 @router.get("/task", response=list[TaskOut], url_name="task_list")
+@paginate()
 def list_taks(request: HttpRequest) -> HttpResponse:
     """List tasks of the user."""
     query_set = Task.objects.filter(created_by=request.user)

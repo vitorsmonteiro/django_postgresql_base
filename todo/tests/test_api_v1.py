@@ -28,23 +28,26 @@ class TestListAPI:
         response = client.get(
             url, headers={"Authorization": f"Bearer {user_fixture.token}"}
         )
-        expected = [
-            {
-                "id": task_fixture.pk,
-                "title": task_fixture.title,
-                "description": task_fixture.description,
-                "status": task_fixture.status,
-                "created_by": task_fixture.created_by.email,
-                "created_at": task_fixture.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ")[
-                    :-4
-                ]
-                + "Z",
-                "updated_at": task_fixture.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ")[
-                    :-4
-                ]
-                + "Z",
-            },
-        ]
+        expected = {
+            "items": [
+                {
+                    "id": task_fixture.pk,
+                    "title": task_fixture.title,
+                    "description": task_fixture.description,
+                    "status": task_fixture.status,
+                    "created_by": task_fixture.created_by.email,
+                    "created_at": task_fixture.created_at.strftime(
+                        "%Y-%m-%dT%H:%M:%S.%fZ"
+                    )[:-4]
+                    + "Z",
+                    "updated_at": task_fixture.updated_at.strftime(
+                        "%Y-%m-%dT%H:%M:%S.%fZ"
+                    )[:-4]
+                    + "Z",
+                },
+            ],
+            "count": len(Task.objects.filter(created_by=user_fixture)),
+        }
         assert response.status_code == HTTPStatus.OK
         assert response.json() == expected
 
@@ -56,7 +59,10 @@ class TestListAPI:
             url, headers={"Authorization": f"Bearer {user_fixture2.token}"}
         )
         assert response.status_code == HTTPStatus.OK
-        assert response.json() == []
+        assert response.json() == {
+            "items": [],
+            "count": len(Task.objects.filter(created_by=user_fixture2)),
+        }
 
 
 class TestCreateAPI:

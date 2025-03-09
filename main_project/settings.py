@@ -173,6 +173,7 @@ if not TESTING:
 
 # Common settings
 PAGINATION_SIZE = 5
+NINJA_PAGINATION_PER_PAGE = 5
 
 # Replace default user model
 AUTH_USER_MODEL = "authentication.User"
