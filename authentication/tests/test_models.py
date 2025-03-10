@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db
 def test_create_user() -> None:
     """Test basic user creation."""
     user = User(first_name="foo", last_name="bar", email="user@email.com")
-    user.set_password("123456")
+    user.set_password("Test*123456")
     user.save()
     assert len(User.objects.all()) == 1
 
@@ -23,7 +23,7 @@ class TestUserManager:
             first_name="foo",
             last_name="bar",
             email="user@email.com",
-            password="123456",  # noqa: S106
+            password="Test*123456",  # noqa: S106
         )
         assert len(User.objects.all()) == 1
         assert user.is_staff is False
@@ -37,7 +37,7 @@ class TestUserManager:
                 first_name="foo",
                 last_name="bar",
                 email="",
-                password="123456",  # noqa: S106
+                password="Test*123456",  # noqa: S106
             )
 
     @staticmethod
@@ -47,7 +47,7 @@ class TestUserManager:
             first_name="foo",
             last_name="bar",
             email="user@email.com",
-            password="123456",  # noqa: S106
+            password="Test*123456",  # noqa: S106
         )
         assert len(User.objects.all()) == 1
         assert user.is_staff is True

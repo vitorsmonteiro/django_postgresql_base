@@ -1,6 +1,7 @@
 import pytest
 
 from authentication.models import User
+from blog.models import Topic
 from todo.models import Task
 
 pytestmark = pytest.mark.django_db
@@ -43,3 +44,11 @@ def task_fixture(user_fixture: User) -> Task:
     )
     task.save()
     return task
+
+
+@pytest.fixture
+def topic_fixture() -> Topic:
+    """Topic fixtrue."""
+    topic = Topic(name="test")
+    topic.save()
+    return topic

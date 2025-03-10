@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "common",
     "authentication",
     "todo",
+    "blog",
     "ninja",
     "django_celery_beat",
     "fontawesomefree",

@@ -71,7 +71,7 @@ def create_user(request: HttpRequest) -> HttpResponse:
             email=form.cleaned_data["email"],
             profile_image=profile_image,
         )
-        user.set_password(form.cleaned_data["password"])
+        user.set_password(form.cleaned_data["password1"])
         user.save()
         login(request, user)
         return redirect(HOME)
