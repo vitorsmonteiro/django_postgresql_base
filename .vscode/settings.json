@@ -12,4 +12,5 @@
             88
         ]
     },
+    "ruff.nativeServer": "on",
 }
