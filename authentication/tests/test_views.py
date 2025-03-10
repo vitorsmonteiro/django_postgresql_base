@@ -80,7 +80,6 @@ class TestCreateUserView:
             "email": "foo@bar.com",
             "password1": "123456*Test",
             "password2": "123456*Test",
-
         }
         response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.FOUND
