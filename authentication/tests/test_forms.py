@@ -22,7 +22,8 @@ class TestCreateUserForm:
             "first_name": "foo",
             "last_name": "bar",
             "email": "foo@bar.com",
-            "password": "123456",
+            "password1": "123456*Test",
+            "password2": "123456*Test",
         }
         form = CreateUserForm(data=data)
         assert form.is_valid() is True
@@ -33,7 +34,8 @@ class TestCreateUserForm:
         data = {
             "last_name": "bar",
             "email": "foo@bar.com",
-            "password": "123456",
+            "password1": "123456*Test",
+            "password2": "123456*Test",
         }
         form = CreateUserForm(data=data)
         assert form.is_valid() is False
@@ -45,7 +47,8 @@ class TestCreateUserForm:
         data = {
             "first_name": "foo",
             "email": "foo@bar.com",
-            "password": "123456",
+            "password1": "123456*Test",
+            "password2": "123456*Test",
         }
         form = CreateUserForm(data=data)
         assert form.is_valid() is False
@@ -57,7 +60,8 @@ class TestCreateUserForm:
         data = {
             "first_name": "foo",
             "last_name": "bar",
-            "password": "123456",
+            "password1": "123456*Test",
+            "password2": "123456*Test",
         }
         form = CreateUserForm(data=data)
         assert form.is_valid() is False
@@ -70,10 +74,11 @@ class TestCreateUserForm:
             "first_name": "foo",
             "last_name": "bar",
             "email": "foo@bar.com",
+            "password1": "123456*Test",
         }
         form = CreateUserForm(data=data)
         assert form.is_valid() is False
-        assert form.errors == {"password": ["This field is required."]}
+        assert form.errors == {"password2": ["This field is required."]}
 
     @staticmethod
     def test_create_user_form_invalid_email() -> None:
@@ -82,7 +87,8 @@ class TestCreateUserForm:
             "first_name": "foo",
             "last_name": "bar",
             "email": "foobar.com",
-            "password": "123456",
+            "password1": "123456*Test",
+            "password2": "123456*Test",
         }
         form = CreateUserForm(data=data)
         assert form.is_valid() is False

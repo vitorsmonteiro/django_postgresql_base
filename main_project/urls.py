@@ -11,6 +11,7 @@ urlpatterns = [
     path("", include("common.urls")),
     path("", include("authentication.urls")),
     path("todo/", include("todo.urls")),
+    path("blog/", include("blog.urls")),
 ]
 
 if not settings.TESTING:

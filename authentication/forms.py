@@ -2,6 +2,7 @@ from typing import Any, ClassVar, Self
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 
@@ -52,13 +53,16 @@ class ResetPasswordForm(forms.Form):
         return self.cleaned_data
 
 
-class CreateUserForm(forms.ModelForm):
+class CreateUserForm(UserCreationForm):
     """Create user form."""
 
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
-    password = forms.CharField(
+    password1 = forms.CharField(
+        max_length=50, required=True, widget=forms.PasswordInput()
+    )
+    password2 = forms.CharField(
         max_length=50, required=True, widget=forms.PasswordInput()
     )
 
@@ -70,7 +74,8 @@ class CreateUserForm(forms.ModelForm):
             "first_name",
             "last_name",
             "email",
-            "password",
+            "password1",
+            "password2",
         ]
 
 
@@ -103,3 +108,22 @@ class EditUserForm(forms.ModelForm):
             if "email" in self.errors:
                 del self.errors["email"]
             self.cleaned_data["email"] = email
+
+
+class CustomUserChangeForm(UserChangeForm):
+    """A form for updating users."""
+
+    class Meta:
+        """Class Meta dara."""
+
+        model = User
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "is_staff",
+            "is_superuser",
+            "groups",
+            "user_permissions",
+        )
