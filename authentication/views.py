@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -14,10 +14,6 @@ from authentication.forms import (
     ResetPasswordForm,
 )
 from authentication.models import User
-
-if TYPE_CHECKING:
-    from django.core.files.uploadedfile import UploadedFile
-
 
 HOME = reverse_lazy("common:home")
 

@@ -1,7 +1,7 @@
 import pytest
 
 from authentication.models import User
-from blog.models import Topic
+from blog.models import Post, Topic
 from todo.models import Task
 
 pytestmark = pytest.mark.django_db
@@ -52,3 +52,13 @@ def topic_fixture() -> Topic:
     topic = Topic(name="test")
     topic.save()
     return topic
+
+
+@pytest.fixture
+def post_fixture(topic_fixture: Topic, user_fixture: User) -> Post:
+    """Post fixture."""
+    post = Post(
+        title="Test", topic=topic_fixture, author=user_fixture, content="content"
+    )
+    post.save()
+    return post

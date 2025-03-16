@@ -69,6 +69,7 @@ ignore = [
     "S101",
     "TRY003",
     "D401",
+    "TCH002",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -77,6 +78,12 @@ unfixable = []
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -104,14 +111,6 @@ docstring-code-format = true
 # This only has an effect when the `docstring-code-format` setting is
 # enabled.
 docstring-code-line-length = 88
-
-# Use google docstring format.
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-# Make parenthesis not required for fixtures
-[tool.ruff.lint.flake8-pytest-style]
-fixture-parentheses = false
 
 [tool.coverage.run]
 omit = [

@@ -1,7 +1,8 @@
 import pytest
 from django.db.utils import IntegrityError
 
-from blog.models import Topic
+from authentication.models import User
+from blog.models import Post, Topic
 
 pytestmark = pytest.mark.django_db
 
@@ -23,3 +24,17 @@ class TestTopicModel:
         topic = Topic(name=topic_fixture.name)
         with pytest.raises(IntegrityError):
             topic.save()
+
+
+class TestPostModel:
+    """Test post model."""
+
+    @staticmethod
+    def test_create_post(topic_fixture: Topic, user_fixture: User) -> None:
+        """Test post creation."""
+        post = Post(
+            title="Test", topic=topic_fixture, author=user_fixture, content="content"
+        )
+        post.save()
+        assert len(Post.objects.all()) == 1
+        assert Post.objects.all()[0] == post

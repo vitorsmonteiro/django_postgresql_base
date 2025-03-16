@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING, ClassVar, Self
+from typing import ClassVar, Self
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -16,8 +17,6 @@ from blog.forms import PostForm, TopicForm
 from blog.models import Post, Topic
 from main_project.settings import PAGINATION_SIZE
 
-if TYPE_CHECKING:
-    from django.core.files.uploadedfile import UploadedFile
 
 class TopicList(LoginRequiredMixin, ListView):
     """List topic generic view."""
@@ -147,6 +146,22 @@ class PostUpdate(PermissionRequiredMixin, UpdateView):
         context["posts"] = Post.objects.all()
         return context
 
+    def form_valid(self: Self, form: PostForm) -> HttpResponse:
+        """Save image with standard_name."""
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            topic = form.cleaned_data["topic"]
+            author = self.request.user
+            content = form.cleaned_data["content"]
+            post = Post(title=title, topic=topic, author=author, content=content)
+            post.save()
+            image: UploadedFile = form.cleaned_data["image"]
+            if image and form.changed_data.get("image"):
+                extension = image.name.split(".")[-1]
+                image.name = (f"post_{post.pk}.{extension}")
+                post.image = image
+                post.save()
+        return HttpResponseRedirect(reverse_lazy("blog:post_list"))
 
 class PostDetail(DetailView):
     """Post generic detail view."""
