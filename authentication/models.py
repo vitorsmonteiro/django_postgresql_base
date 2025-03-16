@@ -75,8 +75,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True, blank=False, null=False)
     profile_image = models.ImageField(
-        upload_to="static/authentication/img/",
-        default="static/authentication/img/blank_profile.jpg",
+        upload_to="authentication",
+        default="authentication/static/authentication/img/blank_profile.jpg",
     )
     token = models.CharField(max_length=50, blank=True, null=False)
     objects = UserManager()

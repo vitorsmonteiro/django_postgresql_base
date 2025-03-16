@@ -1,0 +1,18 @@
+{% extends "common/base.html" %}
+{% block title %}
+    Topics
+{% endblock title %}
+{% block content %}
+    <h1>Topics</h1>
+    <div class="container">
+        <input class="form-control"
+               type="search"
+               name="search"
+               placeholder="Begin typing To search posts..."
+               hx-get="{% url 'blog:post_list' %}"
+               hx-trigger="input changed delay:100ms, keyup[key=='Enter'], load"
+               hx-target="#topic-result"
+               hx-indicator=".htmx-indicator">
+    </div>
+    <div class="container mt-3">{% include "blog/components/post_table.html" %}</div>
+{% endblock content %}

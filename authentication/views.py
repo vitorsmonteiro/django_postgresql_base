@@ -1,8 +1,8 @@
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.files.uploadedfile import UploadedFile  # noqa: TCH002
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
@@ -14,6 +14,10 @@ from authentication.forms import (
     ResetPasswordForm,
 )
 from authentication.models import User
+
+if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
+
 
 HOME = reverse_lazy("common:home")
 
@@ -139,8 +143,8 @@ def edit_user(request: HttpRequest) -> HttpResponse:
         user.last_name = form.cleaned_data["last_name"]
         user.email = form.cleaned_data["email"]
         if profile_image:
-            extension = profile_image._name.split(".")[-1]  # noqa: SLF001
-            profile_image._set_name(f"profile_image_{user.pk}.{extension}")  # noqa: SLF001
+            extension = profile_image.name.split(".")[-1]
+            profile_image.name = (f"profile_image_{user.pk}.{extension}")
             user.profile_image = profile_image
         user.save()
         return redirect(HOME)

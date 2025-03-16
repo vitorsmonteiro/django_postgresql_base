@@ -1,0 +1,24 @@
+{% extends "common/base.html" %}
+{% load static %}
+{% block content %}
+    <div>
+        <h1>{{ post.title }}</h1>
+        <img src="{{ post.image.url }}"
+             alt="{{ post.title }} image"
+             height="300"
+             width="600" />
+    </div>
+    <div>
+        <span>{{ post.author.first_name }} {{ post.author.last_name }}</span>
+        <span>{{ post.creates_at }}</span>
+    </div>
+    <div>{{ post.content }}</div>
+    <div>
+        {% if post.previous %}
+            <span><a href="{% url 'blog:post_detail' post.previous.pk %}">Previous</a></span>
+        {% endif %}
+        {% if post.next %}
+            <span><a href="{% url 'blog:post_detail' post.next.pk %}">Previous</a></span>
+        {% endif %}
+    </div>
+{% endblock content %}

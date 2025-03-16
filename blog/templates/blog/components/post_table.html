@@ -1,0 +1,40 @@
+<div class="container" id="topic-result">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Posts</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in page_obj %}
+                <tr>
+                    <td><a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a></td>
+                    <td>
+                        {% if perms.blog.change_post %}
+                            <a href="{% url 'blog:post_update' post.pk %}"><i class="fa-solid fa-pen-to-square"></i></a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if perms.blog.delete_post %}
+                            <a href="{% url 'blog:post_delete' post.pk %}"><i class="fa-solid fa-trash text-danger"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                {% if perms.blog.add_post %}
+                    <td>
+                        <a href="{% url 'blog:post_create' %}">
+                            <button class="btn btn-primary">Add post</button>
+                        </a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                {% endif %}
+            </tr>
+        </tbody>
+    </table>
+    {% include "blog/components/post_pagination.html" %}
+</div>

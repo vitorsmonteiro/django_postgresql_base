@@ -1,0 +1,48 @@
+{% extends "common/base.html" %}
+{% block content %}
+    {% if errors %}
+        {% for error in errors %}<p>{{ error }}</p>{% endfor %}
+    {% endif %}
+    <div class="modal-body">
+        <form method="post"
+              enctype="multipart/form-data"
+              action="{% url 'blog:post_create' %}">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Title</span>
+                <input type="text"
+                       name="title"
+                       class="form-control"
+                       value="{{ post.title }}"
+                       required />
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Topic</label>
+                <select name="topic" class="form-control">
+                    {% for topic in topics %}
+                        <option value="topic" {% if topic == post.topic %}selected{% endif %}>{{ topic }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Image</span>
+                <input type="file" name="image" class="form-control" />
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Previous post</label>
+                <select name="topic" class="form-control">
+                    {% for pt in posts %}
+                        <option value="topic" {% if pt == post.previous %}selected{% endif %}>{{ post }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon2">Content</span>
+                <textarea name="content"
+                          class="form-control"
+                          rows="20"">{{ post.content }}</textarea>
+            </div>
+            <input type="submit" value="Create" class="btn btn-primary">
+        </form>
+    </div>
+{% endblock content %}

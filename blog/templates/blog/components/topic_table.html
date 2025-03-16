@@ -13,12 +13,12 @@
                     <td>{{ topic.name }}</td>
                     <td>
                         {% if perms.blog.change_topic %}
-                            <a href="{% url 'blog:topic_update' topic.id %}"><i class="fa-solid fa-pen-to-square"></i></a>
+                            <a href="{% url 'blog:topic_update' topic.pk %}"><i class="fa-solid fa-pen-to-square"></i></a>
                         {% endif %}
                     </td>
                     <td>
                         {% if perms.blog.delete_topic %}
-                            <a href="{% url 'blog:topic_delete' topic.id %}"><i class="fa-solid fa-trash text-danger"></i></a>
+                            <a href="{% url 'blog:topic_delete' topic.pk %}"><i class="fa-solid fa-trash text-danger"></i></a>
                         {% endif %}
                     </td>
                 </tr>

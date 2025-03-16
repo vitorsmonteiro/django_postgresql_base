@@ -1,9 +1,10 @@
 from debug_toolbar.toolbar import debug_toolbar_urls
-from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
 from main_project.api import api_v1
+from main_project.settings import DEBUG, MEDIA_ROOT, MEDIA_URL, TESTING
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -14,5 +15,8 @@ urlpatterns = [
     path("blog/", include("blog.urls")),
 ]
 
-if not settings.TESTING:
+if DEBUG:
+    urlpatterns = [*urlpatterns, *static(MEDIA_URL, document_root=MEDIA_ROOT)]
+
+if not TESTING:
     urlpatterns = [*urlpatterns, *debug_toolbar_urls()]

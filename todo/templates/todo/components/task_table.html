@@ -40,16 +40,16 @@
             {% for task in page_obj %}
                 <tr>
                     <td>
-                        <a href="{% url 'todo:task_detail' task.id %}">{{ task.title }}</a>
+                        <a href="{% url 'todo:task_detail' task.pk %}">{{ task.title }}</a>
                     </td>
                     <td>{{ task.description }}</td>
                     <td>{{ task.get_status_display }}</td>
                     <td>{{ task.created_at }}</td>
                     <td>
-                        <a href="{% url 'todo:task_update' task.id %}"><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="{% url 'todo:task_update' task.pk %}"><i class="fa-solid fa-pen-to-square"></i></a>
                     </td>
                     <td>
-                        <a href="{% url 'todo:task_delete' task.id %}"><i class="fa-solid fa-trash text-danger"></i></a>
+                        <a href="{% url 'todo:task_delete' task.pk %}"><i class="fa-solid fa-trash text-danger"></i></a>
                     </td>
                 </tr>
             {% endfor %}
