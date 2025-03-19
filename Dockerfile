@@ -3,13 +3,11 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV PATH="/app/.venv/bin:$PATH"
 
 RUN apt-get update && \
-    apt-get -y install gcc postgresql && \
+    apt-get -y install gcc postgresql curl ca-certificates && \
     apt-get clean
-
-ADD . /usr/src/app
-WORKDIR /usr/src/app
 
 COPY celery/start_worker.sh /start_worker.sh
 RUN chmod +x /start_worker.sh
@@ -19,5 +17,8 @@ RUN chmod +x /start_beat.sh
 
 COPY celery/start_flower.sh /start_flower.sh
 RUN chmod +x /start_flower.sh
+
+ADD . /app
+WORKDIR /app
 
 RUN uv sync --frozen --no-dev
