@@ -1,6 +1,5 @@
-FROM python:3.13.0-slim
-
-WORKDIR /usr/src/app
+FROM python:3.13.2-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -9,14 +8,8 @@ RUN apt-get update && \
     apt-get -y install gcc postgresql && \
     apt-get clean
 
-RUN pip install --upgrade pip
-RUN pip install poetry
-
-COPY poetry.lock .
-COPY pyproject.toml .
-
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-interaction --no-ansi --without dev
+ADD . /usr/src/app
+WORKDIR /usr/src/app
 
 COPY celery/start_worker.sh /start_worker.sh
 RUN chmod +x /start_worker.sh
@@ -27,4 +20,4 @@ RUN chmod +x /start_beat.sh
 COPY celery/start_flower.sh /start_flower.sh
 RUN chmod +x /start_flower.sh
 
-COPY . .
+RUN uv sync --frozen --no-dev
