@@ -3,7 +3,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV PATH="/app/.venv/bin:$PATH"
 
 RUN apt-get update && \
     apt-get -y install gcc postgresql curl ca-certificates && \

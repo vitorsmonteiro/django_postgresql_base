@@ -22,20 +22,20 @@ jobs:
       - name: Run docker
         run: docker compose up -d --build
       - name: Analysing the code with ruff
-        run: docker compose exec web ruff check
+        run: docker compose exec web uv run ruff check
         if: always()
       - name: Analysing the code with mypy
-        run: docker compose exec web mypy .
+        run: docker compose exec web uv run mypy .
         if: always()
       - name: Check formating with djlint
-        run: docker compose exec web djlint .
+        run: docker compose exec web uv run djlint .
         if: always()
       - name: Check formating with black
-        run: docker compose exec web ruff format --check
+        run: docker compose exec web uv run ruff format --check
         if: always()
       - name: Run migrations
-        run: docker compose exec web python manage.py migrate
+        run: docker compose exec web uv run python manage.py migrate
         if: always()
       - name: Run tests
-        run: docker compose exec web pytest
+        run: docker compose exec web uv run pytest
         if: always()
