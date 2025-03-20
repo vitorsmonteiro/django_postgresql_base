@@ -4,9 +4,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-dev
-    command: "python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/usr/src/app
     ports:
       - 8000:8000
       - 3000:3000
@@ -17,7 +14,22 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    develop:
+      # Create a `watch` configuration to update the app
+      # https://docs.docker.com/compose/file-watch/#compose-watch-versus-bind-mounts
+      watch:
+        # Sync the working directory with the `/app` directory in the container
+        - action: sync
+          path: .
+          target: /app
+          # Exclude the project virtual environment — it could be for a
+          # different platform in the container
+          ignore:
+            - .venv/
 
+        # Rebuild the image if dependencies change by checking uv.lock
+        - action: rebuild
+          path: ./uv.lock
     
   db:
     image: postgres
@@ -55,7 +67,7 @@ services:
     image: celery_worker
     command: /start_worker.sh
     volumes:
-      - .:/usr/src/app
+      - .:/app
     env_file:
       - .env.dev
     depends_on:
@@ -69,7 +81,7 @@ services:
     image: celery_beat
     command: /start_beat.sh
     volumes:
-      - .:/usr/src/app
+      - .:/app
     env_file:
       - .env.dev
     depends_on:
@@ -83,7 +95,7 @@ services:
     image: celery_flower
     command: /start_flower.sh
     volumes:
-      - .:/usr/src/app
+      - .:/app
     env_file:
       - .env.dev
     ports:

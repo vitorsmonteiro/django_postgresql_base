@@ -3,4 +3,4 @@
 set -o errexit
 set -o nounset
 
-python manage.py celery_worker
+uv run python manage.py celery_worker
