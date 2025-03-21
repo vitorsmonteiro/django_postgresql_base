@@ -135,12 +135,12 @@ class TestCreateAPI:
                     "loc": ["body", "payload", "status"],
                     "msg": (
                         f"Value error, '{data['status']}' is not a valid status. "
-                        f"Valid options: {", ".join(Task.STATUS_CHOICES.keys())}"
+                        f"Valid options: {', '.join(Task.STATUS_CHOICES.keys())}"
                     ),
                     "ctx": {
                         "error": (
                             f"'{data['status']}' is not a valid status. "
-                            f"Valid options: {", ".join(Task.STATUS_CHOICES.keys())}"
+                            f"Valid options: {', '.join(Task.STATUS_CHOICES.keys())}"
                         )
                     },
                 }
@@ -249,12 +249,12 @@ class TestPatchAPI:
                     "loc": ["body", "payload", "status"],
                     "msg": (
                         f"Value error, '{data['status']}' is not a valid status. "
-                        f"Valid options: {", ".join(Task.STATUS_CHOICES.keys())}"
+                        f"Valid options: {', '.join(Task.STATUS_CHOICES.keys())}"
                     ),
                     "ctx": {
                         "error": (
                             f"'{data['status']}' is not a valid status. "
-                            f"Valid options: {", ".join(Task.STATUS_CHOICES.keys())}"
+                            f"Valid options: {', '.join(Task.STATUS_CHOICES.keys())}"
                         )
                     },
                 }
@@ -335,12 +335,12 @@ class TestUpdateAPI:
                     "loc": ["body", "payload", "status"],
                     "msg": (
                         f"Value error, '{data['status']}' is not a valid status. "
-                        f"Valid options: {", ".join(Task.STATUS_CHOICES.keys())}"
+                        f"Valid options: {', '.join(Task.STATUS_CHOICES.keys())}"
                     ),
                     "ctx": {
                         "error": (
                             f"'{data['status']}' is not a valid status. "
-                            f"Valid options: {", ".join(Task.STATUS_CHOICES.keys())}"
+                            f"Valid options: {', '.join(Task.STATUS_CHOICES.keys())}"
                         )
                     },
                 }

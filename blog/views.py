@@ -123,7 +123,7 @@ class PostCreate(PermissionRequiredMixin, CreateView):
             image: UploadedFile = form.cleaned_data["image"]
             if image:
                 extension = image.name.split(".")[-1]
-                image.name = (f"post_{post.pk}.{extension}")
+                image.name = f"post_{post.pk}.{extension}"
                 post.image = image
                 post.save()
         return HttpResponseRedirect(reverse_lazy("blog:post_list"))
@@ -158,10 +158,11 @@ class PostUpdate(PermissionRequiredMixin, UpdateView):
             image: UploadedFile = form.cleaned_data["image"]
             if image and form.changed_data.get("image"):
                 extension = image.name.split(".")[-1]
-                image.name = (f"post_{post.pk}.{extension}")
+                image.name = f"post_{post.pk}.{extension}"
                 post.image = image
                 post.save()
         return HttpResponseRedirect(reverse_lazy("blog:post_list"))
+
 
 class PostDetail(DetailView):
     """Post generic detail view."""

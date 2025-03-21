@@ -43,4 +43,3 @@ class Post(models.Model):
             Post: Post object.
         """
         return Post.objects.filter(previous=self).first()
-

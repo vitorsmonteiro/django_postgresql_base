@@ -7,7 +7,7 @@ from blog.models import Post
 
 
 @receiver(post_delete, sender=Post)
-def delete_image_file(sender: Post, instance: Post, **kwargs: str) -> None: #noqa:ARG001
+def delete_image_file(sender: Post, instance: Post, **kwargs: str) -> None:  # noqa:ARG001
     """Delete image after instance is removed."""
     image = instance.image
     if image:
