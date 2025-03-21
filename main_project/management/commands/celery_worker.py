@@ -9,7 +9,7 @@ from django.utils import autoreload
 
 def restart_celery() -> None:
     """Rerstart celery."""
-    celery_worker_cmd = "celery -A main_project worker"
+    celery_worker_cmd = "uv run celery -A main_project worker"
     cmd = f'pkill -f "{celery_worker_cmd}"'
     if sys.platform == "win32":
         cmd = "taskkill /f /t /im celery.exe"

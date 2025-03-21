@@ -48,7 +48,7 @@ class TaskIn(Schema):
         choices = Task.STATUS_CHOICES.keys()
         if status not in choices:
             msg = (
-                f"'{status}' is not a valid status. Valid options: {", ".join(choices)}"
+                f"'{status}' is not a valid status. Valid options: {', '.join(choices)}"
             )
             raise ValueError(msg)
         return status

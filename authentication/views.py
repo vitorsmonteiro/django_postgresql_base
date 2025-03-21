@@ -140,7 +140,7 @@ def edit_user(request: HttpRequest) -> HttpResponse:
         user.email = form.cleaned_data["email"]
         if profile_image:
             extension = profile_image.name.split(".")[-1]
-            profile_image.name = (f"profile_image_{user.pk}.{extension}")
+            profile_image.name = f"profile_image_{user.pk}.{extension}"
             user.profile_image = profile_image
         user.save()
         return redirect(HOME)
