@@ -7,7 +7,7 @@ from authentication.forms import (
     ResetPasswordForm,
 )
 from authentication.models import User
-from conftest import USER_PASSWORD
+from authentication.tests.fixtures import USER_PASSWORD
 
 pytestmark = pytest.mark.django_db
 

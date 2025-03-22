@@ -45,8 +45,8 @@ extend-exclude = ["migrations", "manage.py"]
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.11
-target-version = "py311"
+# Assume Python 3.13
+target-version = "py313"
 
 [tool.ruff.lint]
 # Enable all the rules
@@ -123,7 +123,7 @@ source = ["."]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "main_project.settings"
-addopts = "-p no:warnings --create-db -v --cov -n 4"
+addopts = "-p no:warnings --create-db -v --cov"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 
 [tool.coverage.report]
