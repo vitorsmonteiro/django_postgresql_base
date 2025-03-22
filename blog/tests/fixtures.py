@@ -15,6 +15,13 @@ def topic_fixture() -> Topic:
 
 
 @pytest.fixture
+def topic_fixture2() -> Topic:
+    """Topic fixtrue 2."""
+    topic = Topic(name="another_test")
+    topic.save()
+    return topic
+
+@pytest.fixture
 def post_fixture(topic_fixture: Topic, user_fixture: User) -> Post:
     """Post fixture."""
     post = Post(
