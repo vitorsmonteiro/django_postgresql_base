@@ -1,4 +1,5 @@
 {% extends "common/base.html" %}
+{% load blog_tags %}
 {% load static %}
 {% block content %}
     <div>
@@ -12,7 +13,7 @@
         <span>{{ post.author.first_name }} {{ post.author.last_name }}</span>
         <span>{{ post.creates_at }}</span>
     </div>
-    <div>{{ post.content }}</div>
+    <div>{{ post.content | markdown_content }}</div>
     <div>
         {% if post.previous %}
             <span><a href="{% url 'blog:post_detail' post.previous.pk %}">Previous</a></span>
