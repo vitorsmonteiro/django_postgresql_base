@@ -7,6 +7,7 @@ from main_project.api import api_v1
 from main_project.settings import DEBUG, MEDIA_ROOT, MEDIA_URL, TESTING
 
 urlpatterns = [
+    path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
     path("api/v1/", api_v1.urls),
     path("", include("common.urls")),

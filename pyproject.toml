@@ -12,9 +12,11 @@ dependencies = [
     "django-redis>=5.4.0",
     "django-simple-history>=3.8.0",
     "djlint>=1.36.4",
+    "docutils>=0.21.2",
     "flower>=2.0.1",
     "fontawesomefree>=6.6.0",
     "kombu>=5.5.0",
+    "markdown>=3.7",
     "pillow>=11.1.0",
     "psycopg2-binary>=2.9.10",
     "redis>=5.2.1",
@@ -45,8 +47,8 @@ extend-exclude = ["migrations", "manage.py"]
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.11
-target-version = "py311"
+# Assume Python 3.13
+target-version = "py313"
 
 [tool.ruff.lint]
 # Enable all the rules
@@ -123,7 +125,7 @@ source = ["."]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "main_project.settings"
-addopts = "-p no:warnings --create-db -v --cov -n 4"
+addopts = "-p no:warnings --create-db -v --cov"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 
 [tool.coverage.report]

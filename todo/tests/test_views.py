@@ -5,7 +5,7 @@ from django.test import Client, RequestFactory
 from django.urls import reverse_lazy
 
 from authentication.models import User
-from conftest import USER_PASSWORD
+from authentication.tests.fixtures import USER_PASSWORD
 from todo import views
 from todo.models import Task
 

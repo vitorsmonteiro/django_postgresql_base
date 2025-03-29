@@ -18,7 +18,7 @@ from blog.models import Post, Topic
 from main_project.settings import PAGINATION_SIZE
 
 
-class TopicList(LoginRequiredMixin, ListView):
+class TopicListView(LoginRequiredMixin, ListView):
     """List topic generic view."""
 
     model = Topic
@@ -41,7 +41,7 @@ class TopicList(LoginRequiredMixin, ListView):
         return query_set
 
 
-class TopicCreate(PermissionRequiredMixin, CreateView):
+class TopicCreateView(PermissionRequiredMixin, CreateView):
     """Topic generic create view."""
 
     model = Topic
@@ -51,7 +51,7 @@ class TopicCreate(PermissionRequiredMixin, CreateView):
     permission_required: ClassVar[list[str]] = ["blog.add_topic"]
 
 
-class TopicUpdate(PermissionRequiredMixin, UpdateView):
+class TopicUpdateView(PermissionRequiredMixin, UpdateView):
     """Topic generic update view."""
 
     model = Topic
@@ -62,7 +62,7 @@ class TopicUpdate(PermissionRequiredMixin, UpdateView):
     permission_required: ClassVar[list[str]] = ["blog.change_topic"]
 
 
-class TopicDelete(PermissionRequiredMixin, DeleteView):
+class TopicDeleteView(PermissionRequiredMixin, DeleteView):
     """Topic generic delete view."""
 
     model = TopicForm
@@ -72,7 +72,7 @@ class TopicDelete(PermissionRequiredMixin, DeleteView):
     permission_required: ClassVar[list[str]] = ["blog.delete_topic"]
 
 
-class PostList(LoginRequiredMixin, ListView):
+class PostListView(LoginRequiredMixin, ListView):
     """Post generic list view."""
 
     model = Post
@@ -95,7 +95,7 @@ class PostList(LoginRequiredMixin, ListView):
         return query_set
 
 
-class PostCreate(PermissionRequiredMixin, CreateView):
+class PostCreateView(PermissionRequiredMixin, CreateView):
     """Topic generic create view."""
 
     model = Post
@@ -129,7 +129,7 @@ class PostCreate(PermissionRequiredMixin, CreateView):
         return HttpResponseRedirect(reverse_lazy("blog:post_list"))
 
 
-class PostUpdate(PermissionRequiredMixin, UpdateView):
+class PostUpdateView(PermissionRequiredMixin, UpdateView):
     """Post generic update view."""
 
     model = Post
@@ -164,7 +164,7 @@ class PostUpdate(PermissionRequiredMixin, UpdateView):
         return HttpResponseRedirect(reverse_lazy("blog:post_list"))
 
 
-class PostDetail(DetailView):
+class PostDetailView(DetailView):
     """Post generic detail view."""
 
     model = Post
@@ -172,7 +172,7 @@ class PostDetail(DetailView):
     context_object_name = "post"
 
 
-class PostDelete(PermissionRequiredMixin, DeleteView):
+class PostDeleteView(PermissionRequiredMixin, DeleteView):
     """Post generic delete view."""
 
     model = Post
