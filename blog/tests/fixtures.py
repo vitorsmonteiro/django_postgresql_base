@@ -21,6 +21,7 @@ def topic_fixture2() -> Topic:
     topic.save()
     return topic
 
+
 @pytest.fixture
 def post_fixture(topic_fixture: Topic, user_fixture: User) -> Post:
     """Post fixture."""

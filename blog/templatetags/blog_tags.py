@@ -4,6 +4,7 @@ from django.utils.safestring import SafeText, mark_safe
 
 register = template.Library()
 
+
 @register.filter
 def markdown_content(value: str) -> SafeText:
     """Convert Markdown content."""
