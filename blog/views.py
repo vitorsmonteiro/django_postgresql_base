@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -13,8 +14,8 @@ from django.views.generic import (
     UpdateView,
 )
 
-from blog.forms import PostForm, TopicForm
-from blog.models import Post, Topic
+from blog.forms import BlogPostForm, TopicForm
+from blog.models import BlogPost, Topic
 from main_project.settings import PAGINATION_SIZE
 
 
@@ -65,9 +66,9 @@ class TopicUpdateView(PermissionRequiredMixin, UpdateView):
 class TopicDeleteView(PermissionRequiredMixin, DeleteView):
     """Topic generic delete view."""
 
-    model = TopicForm
+    model = Topic
     template_name = "blog/topic_confirm_delete.html"
-    success_url = reverse_lazy("blog:topic_delete")
+    success_url = reverse_lazy("blog:topic_list")
     context_object_name = "topic"
     permission_required: ClassVar[list[str]] = ["blog.delete_topic"]
 
@@ -75,7 +76,7 @@ class TopicDeleteView(PermissionRequiredMixin, DeleteView):
 class PostListView(LoginRequiredMixin, ListView):
     """Post generic list view."""
 
-    model = Post
+    model = BlogPost
     context_object_name = "posts"
     paginate_by = PAGINATION_SIZE
 
@@ -87,7 +88,7 @@ class PostListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self: Self) -> QuerySet:
         """Get queryset data based on request type."""
-        query_set = Post.objects.all()
+        query_set = BlogPost.objects.all()
         query_set = query_set.order_by("title")
         if self.request.headers.get("Hx-Request", False):
             search = self.request.GET.get("search", "")
@@ -98,76 +99,74 @@ class PostListView(LoginRequiredMixin, ListView):
 class PostCreateView(PermissionRequiredMixin, CreateView):
     """Topic generic create view."""
 
-    model = Post
+    model = BlogPost
     template_name = "blog/post_create.html"
-    form_class = PostForm
+    form_class = BlogPostForm
     success_url = reverse_lazy("blog:post_list")
-    permission_required: ClassVar[list[str]] = ["blog.add_post"]
+    permission_required: ClassVar[list[str]] = ["blog.add_blogpost"]
 
     def get_context_data(self: Self, **kwargs: str) -> dict:
         """Override to pass extra context."""
         context = super().get_context_data(**kwargs)
         context["topics"] = Topic.objects.all()
-        context["posts"] = Post.objects.all()
+        context["posts"] = BlogPost.objects.all()
         return context
 
-    def form_valid(self: Self, form: PostForm) -> HttpResponse:
+    def form_valid(self: Self, form: BlogPostForm) -> HttpResponse:
         """Save image with standard_name."""
         if form.is_valid():
             title = form.cleaned_data["title"]
             topic = form.cleaned_data["topic"]
             author = self.request.user
             content = form.cleaned_data["content"]
-            post = Post(title=title, topic=topic, author=author, content=content)
+            post = BlogPost(title=title, topic=topic, author=author, content=content)
             post.save()
-            image: UploadedFile = form.cleaned_data["image"]
+            image: UploadedFile = form.cleaned_data.get("image")
             if image:
                 extension = image.name.split(".")[-1]
-                image.name = f"post_{post.pk}.{extension}"
+                new_image_name = f"post_{post.pk}.{extension}"
+                image.name = new_image_name
                 post.image = image
                 post.save()
-        return HttpResponseRedirect(reverse_lazy("blog:post_list"))
+            return HttpResponseRedirect(reverse_lazy("blog:post_list"))
+        return render(self.request, "blog/post_create.html", context={"form": form})
 
 
 class PostUpdateView(PermissionRequiredMixin, UpdateView):
     """Post generic update view."""
 
-    model = Post
+    model = BlogPost
     template_name = "blog/post_update.html"
-    form_class = PostForm
+    form_class = BlogPostForm
     success_url = reverse_lazy("blog:post_list")
     context_object_name = "post"
-    permission_required: ClassVar[list[str]] = ["blog.change_post"]
+    permission_required: ClassVar[list[str]] = ["blog.change_blogpost"]
 
     def get_context_data(self: Self, **kwargs: str) -> dict:
         """Override to pass extra context."""
         context = super().get_context_data(**kwargs)
         context["topics"] = Topic.objects.all()
-        context["posts"] = Post.objects.all()
+        context["posts"] = BlogPost.objects.all()
         return context
 
-    def form_valid(self: Self, form: PostForm) -> HttpResponse:
+    def form_valid(self: Self, form: BlogPostForm) -> HttpResponse:
         """Save image with standard_name."""
         if form.is_valid():
-            title = form.cleaned_data["title"]
-            topic = form.cleaned_data["topic"]
-            author = self.request.user
-            content = form.cleaned_data["content"]
-            post = Post(title=title, topic=topic, author=author, content=content)
-            post.save()
-            image: UploadedFile = form.cleaned_data["image"]
-            if image and form.changed_data.get("image"):
+            blog_post: BlogPost = form.instance
+            image: UploadedFile = form.cleaned_data.get("image")
+            if image and form.changed_data and "image" in form.changed_data:
                 extension = image.name.split(".")[-1]
-                image.name = f"post_{post.pk}.{extension}"
-                post.image = image
-                post.save()
-        return HttpResponseRedirect(reverse_lazy("blog:post_list"))
+                image.name = f"post_{blog_post.pk}.{extension}"
+                blog_post.image = image
+            blog_post.save()
+            return HttpResponseRedirect(reverse_lazy("blog:post_list"))
+        return render(self.request, "blog/post_update.html", context={"form": form})
 
 
 class PostDetailView(DetailView):
     """Post generic detail view."""
 
-    model = Post
+    model = BlogPost
     template_name = "blog/post_detail.html"
     context_object_name = "post"
 
@@ -175,8 +174,8 @@ class PostDetailView(DetailView):
 class PostDeleteView(PermissionRequiredMixin, DeleteView):
     """Post generic delete view."""
 
-    model = Post
+    model = BlogPost
     template_name = "blog/post_confirm_delete.html"
     success_url = reverse_lazy("blog:post_list")
     context_object_name = "post"
-    permission_required: ClassVar[list[str]] = ["blog.delete_topic"]
+    permission_required: ClassVar[list[str]] = ["blog.delete_blogpost"]

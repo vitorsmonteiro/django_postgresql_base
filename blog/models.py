@@ -18,7 +18,7 @@ class Topic(models.Model):
         return f"{self.name}"
 
 
-class Post(models.Model):
+class BlogPost(models.Model):
     """Post model."""
 
     title = models.CharField(max_length=200, blank=False)
@@ -28,7 +28,7 @@ class Post(models.Model):
     image = models.ImageField(blank=True, null=True, upload_to="posts")
     content = models.CharField(blank=False)
     previous = models.ForeignKey(
-        "Post", blank=True, null=True, on_delete=models.SET_NULL
+        "BlogPost", blank=True, null=True, on_delete=models.SET_NULL
     )
 
     def __str__(self: Self) -> str:
@@ -36,10 +36,10 @@ class Post(models.Model):
         return f"{self.title}"
 
     @property
-    def next(self: Self) -> "Post":
+    def next(self: Self) -> "BlogPost":
         """Get post that references this instance as previoues.
 
         Returns:
             Post: Post object.
         """
-        return Post.objects.filter(previous=self).first()
+        return BlogPost.objects.filter(previous=self).first()

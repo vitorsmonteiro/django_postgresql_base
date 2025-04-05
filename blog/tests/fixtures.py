@@ -1,7 +1,7 @@
 import pytest
 
 from authentication.models import User
-from blog.models import Post, Topic
+from blog.models import BlogPost, Topic
 
 pytestmark = pytest.mark.django_db
 
@@ -23,10 +23,20 @@ def topic_fixture2() -> Topic:
 
 
 @pytest.fixture
-def post_fixture(topic_fixture: Topic, user_fixture: User) -> Post:
+def post_fixture(topic_fixture: Topic, user_fixture: User) -> BlogPost:
     """Post fixture."""
-    post = Post(
+    post = BlogPost(
         title="Test", topic=topic_fixture, author=user_fixture, content="content"
+    )
+    post.save()
+    return post
+
+
+@pytest.fixture
+def post_fixture2(topic_fixture2: Topic, user_fixture: User) -> BlogPost:
+    """Post fixture."""
+    post = BlogPost(
+        title="Test2", topic=topic_fixture2, author=user_fixture, content="content2"
     )
     post.save()
     return post

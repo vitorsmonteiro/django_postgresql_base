@@ -70,7 +70,7 @@ class Message(Schema):
 
 @router.get("/task", response=list[TaskOut], url_name="task_list")
 @paginate()
-def list_taks(
+def list_task(
     request: HttpRequest, sort: str = "created_at", status: str | None = None
 ) -> HttpResponse:
     """List API.

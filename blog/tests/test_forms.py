@@ -1,7 +1,7 @@
 import pytest
 
 from authentication.models import User
-from blog.forms import PostForm, TopicForm
+from blog.forms import BlogPostForm, TopicForm
 from blog.models import Topic
 
 pytestmark = pytest.mark.django_db
@@ -38,7 +38,7 @@ class TestPostForm:
             "topic": topic_fixture,
             "content": "Content",
         }
-        form = PostForm(data=data)
+        form = BlogPostForm(data=data)
         assert form.is_valid() is True
 
     @staticmethod
@@ -54,6 +54,6 @@ class TestPostForm:
             "content": "Content",
         }
         del data[field]
-        form = PostForm(data=data)
+        form = BlogPostForm(data=data)
         assert form.is_valid() is False
         assert form.errors[field] == ["This field is required."]
