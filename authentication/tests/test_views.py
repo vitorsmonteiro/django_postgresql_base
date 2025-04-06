@@ -2,11 +2,13 @@ from http import HTTPStatus
 from pathlib import Path
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import Client
 from django.urls import reverse_lazy
 
 from authentication.models import User
 from authentication.tests.fixtures import USER_PASSWORD
+from main_project.settings import MEDIA_ROOT
 
 pytestmark = pytest.mark.django_db
 
@@ -74,13 +76,28 @@ class TestCreateUserView:
     def test_post_view_ok(client: Client) -> None:
         """Test post view ok."""
         url = reverse_lazy("authentication:create_user")
+        path = Path().cwd()
+        path = (
+            path
+            / "authentication"
+            / "static"
+            / "authentication"
+            / "img"
+            / "blank_profile.jpg"
+        )
+        with path.open("rb") as file:
+            image = SimpleUploadedFile(
+                "image.jpg", file.read(), content_type="image/jpeg"
+            )
         data = {
             "first_name": "foo",
             "last_name": "bar",
             "email": "foo@bar.com",
             "password1": "123456*Test",
             "password2": "123456*Test",
+            "profile_image": image,
         }
+        stored_image = MEDIA_ROOT / "authentication" / "profile_image_1.jpg"
         response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.FOUND
         assert len(User.objects.all()) == 1
@@ -88,6 +105,8 @@ class TestCreateUserView:
         assert user.first_name == data["first_name"]
         assert user.last_name == data["last_name"]
         assert user.email == data["email"]
+        assert stored_image.exists() is True
+        stored_image.unlink()
 
     @staticmethod
     def test_post_view_nok(client: Client) -> None:

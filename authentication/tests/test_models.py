@@ -13,6 +13,14 @@ def test_create_user() -> None:
     assert len(User.objects.all()) == 1
 
 
+def test_delete_user() -> None:
+    """Test basic user delete."""
+    user = User(first_name="foo", last_name="bar", email="user@email.com")
+    user.set_password("Test*123456")
+    user.save()
+    assert len(User.objects.all()) == 1
+
+
 class TestUserManager:
     """Test UserManager."""
 

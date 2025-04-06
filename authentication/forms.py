@@ -65,6 +65,7 @@ class CreateUserForm(UserCreationForm):
     password2 = forms.CharField(
         max_length=50, required=True, widget=forms.PasswordInput()
     )
+    profile_image = forms.ImageField(required=False)
 
     class Meta:
         """Form meta data."""
@@ -76,6 +77,7 @@ class CreateUserForm(UserCreationForm):
             "email",
             "password1",
             "password2",
+            "profile_image",
         ]
 
 

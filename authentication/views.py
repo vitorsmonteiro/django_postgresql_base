@@ -14,6 +14,7 @@ from authentication.forms import (
     ResetPasswordForm,
 )
 from authentication.models import User
+from main_project.settings import MEDIA_ROOT
 
 HOME = reverse_lazy("common:home")
 
@@ -64,15 +65,19 @@ def create_user(request: HttpRequest) -> HttpResponse:
         return render(request, "authentication/create_user.html")
     form = CreateUserForm(request.POST, request.FILES)
     if form.is_valid():
-        profile_image = form.cleaned_data.get("profile_image")
+        profile_image: UploadedFile = form.cleaned_data.get("profile_image")
         user = User(
             first_name=form.cleaned_data["first_name"],
             last_name=form.cleaned_data["last_name"],
             email=form.cleaned_data["email"],
-            profile_image=profile_image,
         )
         user.set_password(form.cleaned_data["password1"])
         user.save()
+        if profile_image:
+            extension = profile_image.name.split(".")[-1]
+            profile_image.name = f"profile_image_{user.pk}.{extension}"
+            user.profile_image = profile_image
+            user.save()
         login(request, user)
         return redirect(HOME)
     return render(request, "authentication/create_user.html", {"errors": form.errors})
@@ -133,14 +138,18 @@ def edit_user(request: HttpRequest) -> HttpResponse:
         return render(request, "authentication/edit_user.html")
     form = EditUserForm(request.POST, request.FILES)
     if form.is_valid():
-        profile_image: UploadedFile = form.cleaned_data["profile_image"]
+        profile_image: UploadedFile = form.cleaned_data.get("profile_image")
         user: User = request.user
         user.first_name = form.cleaned_data["first_name"]
         user.last_name = form.cleaned_data["last_name"]
         user.email = form.cleaned_data["email"]
-        if profile_image:
+        if profile_image and "profile_image" in form.changed_data:
             extension = profile_image.name.split(".")[-1]
-            profile_image.name = f"profile_image_{user.pk}.{extension}"
+            image_name = f"profile_image_{user.pk}.{extension}"
+            stored_image = MEDIA_ROOT / image_name
+            if stored_image.exists():
+                stored_image.unlink()
+            profile_image.name = image_name
             user.profile_image = profile_image
         user.save()
         return redirect(HOME)
