@@ -51,13 +51,11 @@
                            role="button"
                            data-bs-toggle="dropdown"
                            aria-expanded="false">
-                            {% if user.profile_image %}
-                                <img src="{{ user.profile_image.url }}"
-                                     height="30"
-                                     width="25"
-                                     class="rounded"
-                                     alt="User profile image" />
-                            {% endif %}
+                            <img {% if user.profile_image %}src="{{ user.profile_image.url }}"{% else %}src="../../static/authentication/img/blank_profile.jpg"{% endif %}
+                                 height="30"
+                                 width="25"
+                                 class="rounded"
+                                 alt="User profile image" />
                             <span class="ms-1">{{ user.first_name }}</span></a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>

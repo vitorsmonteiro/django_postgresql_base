@@ -30,7 +30,7 @@ class TopicOut(Schema):
 
     id: int
     name: str
-    parent_topic: str = Field(..., alias="topic.name")
+    parent_topic: str | None = Field(None, alias="topic.name")
 
 
 class PostIn(Schema):
@@ -81,7 +81,7 @@ def list_topic(request: HttpRequest, sort: str = "id") -> HttpResponse:  # noqa:
     return query_set.order_by(sort)
 
 
-@router.get("/topic", response=TopicOut, url_name="topic_detail")
+@router.get("/topic/{topic_id}", response=TopicOut, url_name="topic_detail")
 def detail_topic(request: HttpRequest, topic_id: int) -> HttpResponse:  # noqa:ARG001
     """Topic detail API.
 
