@@ -184,4 +184,7 @@ LOGIN_URL = "authentication:login"
 
 # Media files
 MEDIA_URL = "/media/"
-MEDIA_ROOT = Path(BASE_DIR) / "mediafiles"
+if TESTING:
+    MEDIA_ROOT = Path(BASE_DIR) / "test_mediafiles"
+else:
+    MEDIA_ROOT = Path(BASE_DIR) / "mediafiles"

@@ -7,6 +7,7 @@ from ninja import NinjaAPI
 from ninja.security import HttpBearer
 
 from authentication.models import User
+from blog.api.api_v1 import router as blog_router_v1
 from todo.api.api_v1 import router as todo_router_v1
 
 
@@ -38,6 +39,7 @@ class GlobalAuth(HttpBearer):
 api_v1 = NinjaAPI(version="1.0.0", auth=GlobalAuth(), title="VitorXYZ API Docs")
 
 api_v1.add_router("/todo/", todo_router_v1)
+api_v1.add_router("/blog/", blog_router_v1)
 
 
 @api_v1.exception_handler(PermissionDenied)

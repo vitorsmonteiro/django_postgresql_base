@@ -1,7 +1,14 @@
 {% extends "common/base.html" %}
 {% block content %}
-    {% if errors %}
-        {% for error in errors %}<p>{{ error }}</p>{% endfor %}
+    {% if form.errors %}
+        <ul>
+            {% for field, errors in form.errors.items %}
+                <li>{{ field }}</li>
+                <ul>
+                    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+            {% endfor %}
+        </ul>
     {% endif %}
     <div class="modal-body">
         <form method="post"
@@ -11,6 +18,13 @@
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">Name</span>
                 <input type="text" name="name" class="form-control" required />
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Parent topic</label>
+                <select name="parent_topic" class="form-control">
+                    <option selected value="">--</option>
+                    {% for choice in topic_choices %}<option value="{{ choice.pk }}">{{ choice.name }}</option>{% endfor %}
+                </select>
             </div>
             <input type="submit" value="Create" class="btn btn-primary">
         </form>

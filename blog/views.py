@@ -1,4 +1,4 @@
-from typing import ClassVar, Self
+from typing import Any, ClassVar, Self
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.files.uploadedfile import UploadedFile
@@ -51,6 +51,12 @@ class TopicCreateView(PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy("blog:topic_list")
     permission_required: ClassVar[list[str]] = ["blog.add_topic"]
 
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        """Add context data."""
+        context = super().get_context_data(**kwargs)
+        context["topic_choices"] = Topic.objects.all()
+        return context
+
 
 class TopicUpdateView(PermissionRequiredMixin, UpdateView):
     """Topic generic update view."""
@@ -61,6 +67,13 @@ class TopicUpdateView(PermissionRequiredMixin, UpdateView):
     success_url = reverse_lazy("blog:topic_list")
     context_object_name = "topic"
     permission_required: ClassVar[list[str]] = ["blog.change_topic"]
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        """Add context data."""
+        context = super().get_context_data(**kwargs)
+        context["topic_choices"] = Topic.objects.all()
+        return context
+
 
 
 class TopicDeleteView(PermissionRequiredMixin, DeleteView):

@@ -21,9 +21,22 @@
                     <a {% if request.resolver_match.app_name == "todo" %}class="nav-link active"{% else %}class="nav-link"{% endif %}
                        href="{% url 'todo:home' %}">Todo</a>
                 </li>
-                <li class="nav-item">
-                    <a {% if request.resolver_match.app_name == "blog" %}class="nav-link active"{% else %}class="nav-link"{% endif %}
-                       href="{% url 'blog:post_list' %}">Blog</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">Blog</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a {% if request.resolver_match.app_name == "blog" %}class="nav-link active"{% else %}class="nav-link"{% endif %}
+                               href="{% url 'blog:post_list' %}">Posts</a>
+                        </li>
+                        <li>
+                            <a {% if request.resolver_match.app_name == "blog" %}class="nav-link active"{% else %}class="nav-link"{% endif %}
+                               href="{% url 'blog:topic_list' %}">Topics</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
             <div class="form-check form-switch ms-auto flex">
@@ -37,7 +50,15 @@
                            href="#"
                            role="button"
                            data-bs-toggle="dropdown"
-                           aria-expanded="false">{{ user.first_name }}</a>
+                           aria-expanded="false">
+                            {% if user.profile_image %}
+                                <img src="{{ user.profile_image.url }}"
+                                     height="30"
+                                     width="25"
+                                     class="rounded"
+                                     alt="User profile image" />
+                            {% endif %}
+                            <span class="ms-1">{{ user.first_name }}</span></a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
                                 <a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a>

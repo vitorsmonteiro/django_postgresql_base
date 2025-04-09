@@ -8,11 +8,13 @@ from blog.models import BlogPost, Topic
 class TopicForm(forms.ModelForm):
     """Topic form."""
 
+    parent_topic = forms.ModelChoiceField(queryset=Topic.objects.all())
+
     class Meta:
         """Class meta data."""
 
         model = Topic
-        fields: ClassVar[list[str]] = ["name"]
+        fields: ClassVar[list[str]] = ["name", "parent_topic"]
 
 
 class BlogPostForm(forms.ModelForm):
