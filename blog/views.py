@@ -75,7 +75,6 @@ class TopicUpdateView(PermissionRequiredMixin, UpdateView):
         return context
 
 
-
 class TopicDeleteView(PermissionRequiredMixin, DeleteView):
     """Topic generic delete view."""
 
@@ -132,15 +131,20 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
             topic = form.cleaned_data["topic"]
             author = self.request.user
             content = form.cleaned_data["content"]
-            post = BlogPost(title=title, topic=topic, author=author, content=content)
-            post.save()
+            previous_id = form.cleaned_data.get("previous")
+            post = BlogPost.objects.create(
+                title=title, topic=topic, author=author, content=content
+            )
+            if previous_id:
+                previous = BlogPost.objects.get(pk=previous_id)
+                post.previous = previous
             image: UploadedFile = form.cleaned_data.get("image")
             if image:
                 extension = image.name.split(".")[-1]
                 new_image_name = f"post_{post.pk}.{extension}"
                 image.name = new_image_name
                 post.image = image
-                post.save()
+            post.save()
             return HttpResponseRedirect(reverse_lazy("blog:post_list"))
         return render(self.request, "blog/post_create.html", context={"form": form})
 
@@ -165,13 +169,23 @@ class PostUpdateView(PermissionRequiredMixin, UpdateView):
     def form_valid(self: Self, form: BlogPostForm) -> HttpResponse:
         """Save image with standard_name."""
         if form.is_valid():
-            blog_post: BlogPost = form.instance
+            post: BlogPost = form.instance
+            title = form.cleaned_data["title"]
+            topic = form.cleaned_data["topic"]
+            content = form.cleaned_data["content"]
+            previous = form.cleaned_data.get("previous")
+            post.title = title
+            post.topic = topic
+            post.content = content
+            if previous:
+                post.previous = previous
             image: UploadedFile = form.cleaned_data.get("image")
-            if image and form.changed_data and "image" in form.changed_data:
+            if image:
                 extension = image.name.split(".")[-1]
-                image.name = f"post_{blog_post.pk}.{extension}"
-                blog_post.image = image
-            blog_post.save()
+                new_image_name = f"post_{post.pk}.{extension}"
+                image.name = new_image_name
+                post.image = image
+            post.save()
             return HttpResponseRedirect(reverse_lazy("blog:post_list"))
         return render(self.request, "blog/post_update.html", context={"form": form})
 

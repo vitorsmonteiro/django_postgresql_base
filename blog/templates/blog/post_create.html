@@ -23,7 +23,7 @@
                 <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Topic</label>
                 <select name="topic" class="form-control">
                     <option selected value="">--</option>
-                    {% for topic in topics %}<option value="{{ topic }}">{{ topic }}</option>{% endfor %}
+                    {% for topic in topics %}<option value="{{ topic.pk }}">{{ topic }}</option>{% endfor %}
                 </select>
             </div>
             <div class="input-group mb-3">
@@ -32,9 +32,9 @@
             </div>
             <div class="input-group mb-3">
                 <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Previous post</label>
-                <select name="topic" class="form-control">
+                <select name="previous" class="form-control">
                     <option selected value="">--</option>
-                    {% for post in posts %}<option value="{{ previous }}">{{ post }}</option>{% endfor %}
+                    {% for pt in posts %}<option value="{{ pt.pk }}">{{ pt }}</option>{% endfor %}
                 </select>
             </div>
             <div class="input-group mb-3">

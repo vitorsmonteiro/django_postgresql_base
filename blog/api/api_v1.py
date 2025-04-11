@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from ninja import Field, Router, Schema
 from ninja.pagination import paginate
 
-from blog.models import Topic
+from blog.models import BlogPost, Topic
 
 router = Router()
 
@@ -30,33 +30,39 @@ class TopicOut(Schema):
 
     id: int
     name: str
-    parent_topic: str | None = Field(None, alias="topic.name")
+    parent_topic: str | None = Field(None, alias="parent_topic.name")
 
 
-class PostIn(Schema):
-    """Post API input schema."""
+class BlogPostIn(Schema):
+    """BlogPost API input schema."""
 
     title: str
-    topic: str = Field(..., alias="topic.name")
-    author: str = Field(..., alias="name.email")
+    topic: int | None = None
     content: str
-    created_at: datetime
-    updated_at: datetime
-    image: str
-    previous: int
+    image: str | None = None
+    previous: int | None = ""
 
 
-class PostOut(Schema):
-    """Post API Output schema."""
+class BlogPostPathIn(Schema):
+    """BlogPost API input schema."""
+
+    title: str = ""
+    topic: str | None = None
+    content: str = ""
+    image: str = ""
+    previous: int | None = None
+
+
+class BlogPostOut(Schema):
+    """BlogPost API Output schema."""
 
     id: int
     title: str
-    topic: str = Field(..., alias="topic.name")
-    author: str = Field(..., alias="name.email")
+    topic: str | None = Field(None, alias="topic.name")
+    author: str | None = Field(None, alias="author.email")
     content: str
     created_at: datetime
-    updated_at: datetime
-    previous: int
+    previous: str | None = Field(None, alias="previous.title")
 
 
 class Message(Schema):
@@ -113,13 +119,14 @@ def create_topic(request: HttpRequest, payload: TopicIn) -> HttpResponse:  # noq
     """
     topic = Topic.objects.create(name=payload.name)
     if payload.parent_topic:
-        topic.parent_topic = payload.parent_topic
+        parent_topic = get_object_or_404(Topic, pk=payload.parent_topic)
+        topic.parent_topic = parent_topic
         topic.save()
     return HTTPStatus.OK, topic
 
 
 @router.put(
-    "/topic",
+    "/topic/{topic_id}",
     url_name="topic_update",
     response={HTTPStatus.OK: TopicOut, HTTPStatus.BAD_REQUEST: Message},
 )
@@ -143,7 +150,7 @@ def update_topic(request: HttpRequest, topic_id: int, payload: TopicIn) -> HttpR
 
 
 @router.patch(
-    "/topic",
+    "/topic/{topic_id}",
     url_name="topic_patch",
     response={HTTPStatus.OK: TopicOut, HTTPStatus.BAD_REQUEST: Message},
 )
@@ -169,3 +176,159 @@ def patch_topic(
         topic.parent_topic = payload.parent_topic
     topic.save()
     return HTTPStatus.OK, topic
+
+
+@router.delete("/topic/{topic_id}", url_name="topic_delete")
+def delete_topic(request: HttpRequest, topic_id: int) -> HttpResponse:  # noqa:ARG001
+    """Topic delete API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        topic_id (int): Topic id.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    topic = get_object_or_404(Topic, pk=topic_id)
+    topic.delete()
+    return HTTPStatus.OK
+
+
+@router.get("/blog_post", response=list[BlogPostOut], url_name="blog_post_list")
+@paginate()
+def list_blog_post(request: HttpRequest, sort: str = "id") -> HttpResponse:  # noqa:ARG001
+    """Blog post list API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        sort (str, optional): Sort list by sort value. Defaults to "id".
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    query_set = BlogPost.objects.all()
+    return query_set.order_by(sort)
+
+
+@router.get("/blog_post/{post_id}", response=BlogPostOut, url_name="blog_post_detail")
+def detail_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:  # noqa:ARG001
+    """Blog post detail API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        post_id (int): BlogPost id.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    post = get_object_or_404(BlogPost, pk=post_id)
+    return HTTPStatus.OK, post
+
+
+@router.post(
+    "/blog_post",
+    url_name="blog_post_create",
+    response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
+)
+def create_blog_post(request: HttpRequest, payload: BlogPostIn) -> HttpResponse:
+    """BlogPost create API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        payload (BlogPostIn): BlogPost creation schema.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    topic = get_object_or_404(Topic, pk=payload.topic)
+    post = BlogPost.objects.create(
+        title=payload.title, topic=topic, author=request.user, content=payload.content
+    )
+    if payload.previous:
+        previous = get_object_or_404(BlogPost, pk=payload.previous)
+        post.previous = previous
+        post.save()
+    return HTTPStatus.OK, post
+
+
+@router.put(
+    "/blog_post/{post_id}",
+    url_name="blog_post_update",
+    response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
+)
+def update_blog_post(
+    request: HttpRequest,  # noqa: ARG001
+    post_id: int,
+    payload: BlogPostIn,
+) -> HttpResponse:
+    """Topic update API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        post_id (int): BlogPost id.
+        payload (BlogPostIn): BlogPost creation schema.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    topic = get_object_or_404(Topic, pk=payload.topic)
+    post = get_object_or_404(BlogPost, pk=post_id)
+    post.title = payload.title
+    post.topic = topic
+    post.content = payload.content
+    if payload.previous:
+        previous = get_object_or_404(BlogPost, pk=payload.previous)
+        post.previous = previous
+    post.save()
+    return HTTPStatus.OK, post
+
+
+@router.patch(
+    "/blog_post/{post_id}",
+    url_name="blog_post_patch",
+    response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
+)
+def patch_blog_post(
+    request: HttpRequest,  # noqa: ARG001
+    post_id: int,
+    payload: BlogPostPathIn,
+) -> HttpResponse:
+    """Topic patch API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        post_id (int): BlogPost id.
+        payload (BlogPostPathIn): BlogPost creation schema.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    post = get_object_or_404(BlogPost, pk=post_id)
+    if payload.title:
+        post.title = payload.title
+    if payload.topic:
+        topic = get_object_or_404(Topic, pk=payload.topic)
+        post.topic = topic
+    if payload.content:
+        post.content = payload.content
+    if payload.previous:
+        previous = get_object_or_404(BlogPost, pk=payload.previous)
+        post.previous = previous
+    post.save()
+    return HTTPStatus.OK, post
+
+
+@router.delete("/blog_post/{post_id}", url_name="blog_post_delete")
+def delete_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:  # noqa:ARG001
+    """Topic delete API.
+
+    Args:
+        request (HttpRequest): HttpRequest object.
+        post_id (int): BlogPost id.
+
+    Returns:
+        HttpResponse: HttpResponse object.
+    """
+    post = get_object_or_404(BlogPost, pk=post_id)
+    post.delete()
+    return HTTPStatus.OK

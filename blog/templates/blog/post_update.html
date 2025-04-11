@@ -13,7 +13,7 @@
     <div class="modal-body">
         <form method="post"
               enctype="multipart/form-data"
-              action="{% url 'blog:post_create' %}">
+              action="{% url 'blog:post_update' post.pk %}">
             {% csrf_token %}
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">Title</span>
@@ -27,8 +27,9 @@
                 <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Topic</label>
                 <select name="topic" class="form-control">
                     {% for topic in topics %}
-                        <option value="topic" {% if topic == post.topic %}selected{% endif %}>{{ topic }}</option>
+                        <option value="{{ topic.pk }}" {% if topic == post.topic %}selected{% endif %}>{{ topic }}</option>
                     {% endfor %}
+                    <option value="">--</option>
                 </select>
             </div>
             <div class="input-group mb-3">
@@ -37,10 +38,11 @@
             </div>
             <div class="input-group mb-3">
                 <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Previous post</label>
-                <select name="topic" class="form-control">
+                <select name="previous" class="form-control">
                     {% for pt in posts %}
-                        <option value="topic" {% if pt == post.previous %}selected{% endif %}>{{ post }}</option>
+                        <option value="{{ pt.pk }}" {% if pt == post.previous %}selected{% endif %}>{{ pt }}</option>
                     {% endfor %}
+                    <option value="">--</option>
                 </select>
             </div>
             <div class="input-group mb-3">
@@ -49,7 +51,7 @@
                           class="form-control"
                           rows="20"">{{ post.content }}</textarea>
             </div>
-            <input type="submit" value="Create" class="btn btn-primary">
+            <input type="submit" value="Save" class="btn btn-primary">
         </form>
     </div>
 {% endblock content %}
