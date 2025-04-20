@@ -85,7 +85,7 @@ class TopicDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required: ClassVar[list[str]] = ["blog.delete_topic"]
 
 
-class PostListView(LoginRequiredMixin, ListView):
+class BlogPostListView(LoginRequiredMixin, ListView):
     """Post generic list view."""
 
     model = BlogPost
@@ -108,7 +108,7 @@ class PostListView(LoginRequiredMixin, ListView):
         return query_set
 
 
-class PostCreateView(PermissionRequiredMixin, CreateView):
+class BlogPostCreateView(PermissionRequiredMixin, CreateView):
     """Topic generic create view."""
 
     model = BlogPost
@@ -149,7 +149,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
         return render(self.request, "blog/post_create.html", context={"form": form})
 
 
-class PostUpdateView(PermissionRequiredMixin, UpdateView):
+class BlogPostUpdateView(PermissionRequiredMixin, UpdateView):
     """Post generic update view."""
 
     model = BlogPost
@@ -180,7 +180,7 @@ class PostUpdateView(PermissionRequiredMixin, UpdateView):
             if previous:
                 post.previous = previous
             image: UploadedFile = form.cleaned_data.get("image")
-            if image:
+            if image and "image" in form.changed_data:
                 extension = image.name.split(".")[-1]
                 new_image_name = f"post_{post.pk}.{extension}"
                 image.name = new_image_name
@@ -190,7 +190,7 @@ class PostUpdateView(PermissionRequiredMixin, UpdateView):
         return render(self.request, "blog/post_update.html", context={"form": form})
 
 
-class PostDetailView(DetailView):
+class BlogPostDetailView(DetailView):
     """Post generic detail view."""
 
     model = BlogPost
@@ -198,7 +198,7 @@ class PostDetailView(DetailView):
     context_object_name = "post"
 
 
-class PostDeleteView(PermissionRequiredMixin, DeleteView):
+class BlogPostDeleteView(PermissionRequiredMixin, DeleteView):
     """Post generic delete view."""
 
     model = BlogPost

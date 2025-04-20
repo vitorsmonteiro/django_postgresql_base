@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from ninja import Field, Router, Schema
+from ninja import Field, File, Form, Router, Schema, UploadedFile
 from ninja.pagination import paginate
 
 from blog.models import BlogPost, Topic
@@ -39,7 +39,6 @@ class BlogPostIn(Schema):
     title: str
     topic: int | None = None
     content: str
-    image: str | None = None
     previous: int | None = ""
 
 
@@ -49,7 +48,6 @@ class BlogPostPathIn(Schema):
     title: str = ""
     topic: str | None = None
     content: str = ""
-    image: str = ""
     previous: int | None = None
 
 
@@ -230,12 +228,17 @@ def detail_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:  # noq
     url_name="blog_post_create",
     response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
 )
-def create_blog_post(request: HttpRequest, payload: BlogPostIn) -> HttpResponse:
+def create_blog_post(
+    request: HttpRequest,
+    payload: Form[BlogPostIn],
+    image: File[UploadedFile],
+) -> HttpResponse:
     """BlogPost create API.
 
     Args:
         request (HttpRequest): HttpRequest object.
-        payload (BlogPostIn): BlogPost creation schema.
+        payload (Form[BlogPostIn]): BlogPost creation schema.
+        image (File[UploadedFile]): Blog post image
 
     Returns:
         HttpResponse: HttpResponse object.
@@ -247,7 +250,12 @@ def create_blog_post(request: HttpRequest, payload: BlogPostIn) -> HttpResponse:
     if payload.previous:
         previous = get_object_or_404(BlogPost, pk=payload.previous)
         post.previous = previous
-        post.save()
+    if image:
+        extension = image.name.split(".")[-1]
+        new_image_name = f"post_{post.pk}.{extension}"
+        image.name = new_image_name
+        post.image = image
+    post.save()
     return HTTPStatus.OK, post
 
 
