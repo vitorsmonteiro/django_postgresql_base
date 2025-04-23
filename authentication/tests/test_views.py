@@ -1,3 +1,4 @@
+import shutil
 from http import HTTPStatus
 from pathlib import Path
 
@@ -66,6 +67,13 @@ class TestCreateUserView:
     """Test create_user view."""
 
     @staticmethod
+    def teardown_method() -> None:
+        """Called after each test method to celan up folder."""
+        path = Path(MEDIA_ROOT)
+        if path.exists and path.is_dir:
+            shutil.rmtree(path=path)
+
+    @staticmethod
     def test_get_view(client: Client) -> None:
         """Test get view."""
         url = reverse_lazy("authentication:create_user")
@@ -97,8 +105,10 @@ class TestCreateUserView:
             "password2": "123456*Test",
             "profile_image": image,
         }
-        stored_image = MEDIA_ROOT / "authentication" / "profile_image_1.jpg"
         response = client.post(url, data=data)
+        user = User.objects.first()
+        stored_image = Path(user.profile_image.storage.location)
+        stored_image = stored_image / user.profile_image.name
         assert response.status_code == HTTPStatus.FOUND
         assert len(User.objects.all()) == 1
         user = User.objects.all()[0]
@@ -189,6 +199,13 @@ class TestDeleteAccountView:
 
 class TestEditUserView:
     """Test edit_user view."""
+
+    @staticmethod
+    def teardown_method() -> None:
+        """Called after each test method to celan up folder."""
+        path = Path(MEDIA_ROOT)
+        if path.exists and path.is_dir:
+            shutil.rmtree(path=path)
 
     @staticmethod
     def test_get_view(client: Client, user_fixture: User) -> None:

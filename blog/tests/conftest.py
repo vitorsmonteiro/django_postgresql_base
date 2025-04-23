@@ -15,9 +15,9 @@ def topic_fixture() -> Topic:
 
 
 @pytest.fixture
-def topic_fixture2() -> Topic:
+def topic_fixture2(topic_fixture: Topic) -> Topic:
     """Topic fixtrue 2."""
-    topic = Topic(name="another_test")
+    topic = Topic(name="another_test", parent_topic=topic_fixture)
     topic.save()
     return topic
 

@@ -9,6 +9,7 @@ from ninja.pagination import paginate
 from blog.models import BlogPost, Topic
 
 router = Router()
+NO_PERMISSION = "User does not have permission."
 
 
 class TopicIn(Schema):
@@ -103,9 +104,13 @@ def detail_topic(request: HttpRequest, topic_id: int) -> HttpResponse:  # noqa:A
 @router.post(
     "/topic",
     url_name="topic_create",
-    response={HTTPStatus.OK: TopicOut, HTTPStatus.BAD_REQUEST: Message},
+    response={
+        HTTPStatus.OK: TopicOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.UNAUTHORIZED: Message,
+    },
 )
-def create_topic(request: HttpRequest, payload: TopicIn) -> HttpResponse:  # noqa:ARG001
+def create_topic(request: HttpRequest, payload: TopicIn) -> HttpResponse:
     """Topic create API.
 
     Args:
@@ -115,6 +120,8 @@ def create_topic(request: HttpRequest, payload: TopicIn) -> HttpResponse:  # noq
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.add_topic"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     topic = Topic.objects.create(name=payload.name)
     if payload.parent_topic:
         parent_topic = get_object_or_404(Topic, pk=payload.parent_topic)
@@ -126,9 +133,13 @@ def create_topic(request: HttpRequest, payload: TopicIn) -> HttpResponse:  # noq
 @router.put(
     "/topic/{topic_id}",
     url_name="topic_update",
-    response={HTTPStatus.OK: TopicOut, HTTPStatus.BAD_REQUEST: Message},
+    response={
+        HTTPStatus.OK: TopicOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.UNAUTHORIZED: Message,
+    },
 )
-def update_topic(request: HttpRequest, topic_id: int, payload: TopicIn) -> HttpResponse:  # noqa:ARG001
+def update_topic(request: HttpRequest, topic_id: int, payload: TopicIn) -> HttpResponse:
     """Topic update API.
 
     Args:
@@ -139,10 +150,15 @@ def update_topic(request: HttpRequest, topic_id: int, payload: TopicIn) -> HttpR
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.change_topic"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.name = payload.name
     if payload.parent_topic:
-        topic.parent_topic = payload.parent_topic
+        parent_topic = get_object_or_404(Topic, pk=payload.parent_topic)
+        topic.parent_topic = parent_topic
+    else:
+        topic.parent_topic = None
     topic.save()
     return HTTPStatus.OK, topic
 
@@ -150,10 +166,14 @@ def update_topic(request: HttpRequest, topic_id: int, payload: TopicIn) -> HttpR
 @router.patch(
     "/topic/{topic_id}",
     url_name="topic_patch",
-    response={HTTPStatus.OK: TopicOut, HTTPStatus.BAD_REQUEST: Message},
+    response={
+        HTTPStatus.OK: TopicOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.UNAUTHORIZED: Message,
+    },
 )
 def patch_topic(
-    request: HttpRequest,  # noqa:ARG001
+    request: HttpRequest,
     topic_id: int,
     payload: TopicInPatch,
 ) -> HttpResponse:
@@ -167,6 +187,8 @@ def patch_topic(
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.change_topic"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     topic = get_object_or_404(Topic, pk=topic_id)
     if payload.name:
         topic.name = payload.name
@@ -176,8 +198,12 @@ def patch_topic(
     return HTTPStatus.OK, topic
 
 
-@router.delete("/topic/{topic_id}", url_name="topic_delete")
-def delete_topic(request: HttpRequest, topic_id: int) -> HttpResponse:  # noqa:ARG001
+@router.delete(
+    "/topic/{topic_id}",
+    url_name="topic_delete",
+    response={HTTPStatus.OK: None, HTTPStatus.UNAUTHORIZED: Message},
+)
+def delete_topic(request: HttpRequest, topic_id: int) -> HttpResponse:
     """Topic delete API.
 
     Args:
@@ -187,6 +213,8 @@ def delete_topic(request: HttpRequest, topic_id: int) -> HttpResponse:  # noqa:A
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.delete_topic"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.delete()
     return HTTPStatus.OK

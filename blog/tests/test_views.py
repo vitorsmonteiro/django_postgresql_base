@@ -1,8 +1,11 @@
+import shutil
 from http import HTTPStatus
+from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.core.exceptions import PermissionDenied
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory
 from django.urls import reverse_lazy
 
@@ -19,6 +22,7 @@ from blog.views import (
     TopicListView,
     TopicUpdateView,
 )
+from main_project.settings import MEDIA_ROOT
 
 pytestmark = pytest.mark.django_db
 request_factory = RequestFactory()
@@ -364,6 +368,12 @@ class TestBlogListView:
 class TestBlogCreateView:
     """Tests for Post Create View."""
 
+    def teardown_method() -> None:
+        """Called after each test method to celan up folder."""
+        path = Path(MEDIA_ROOT)
+        if path.exists and path.is_dir:
+            shutil.rmtree(path=path)
+
     @staticmethod
     def test_get_view_not_logged() -> None:
         """Test get create view without logging in."""
@@ -426,12 +436,26 @@ class TestBlogCreateView:
     def test_blogpost_view(user_fixture: User, topic_fixture: Topic) -> None:
         """Test post create view with permission."""
         url = reverse_lazy("blog:post_create")
+        cwd = Path().cwd()
+        image_path = (
+            cwd
+            / "authentication"
+            / "static"
+            / "authentication"
+            / "img"
+            / "blank_profile.jpg"
+        )
+        with image_path.open("rb") as file:
+            image = SimpleUploadedFile(
+                "image.jpg", file.read(), content_type="image/jpeg"
+            )
         request = request_factory.post(
             url,
             data={
                 "title": "Test Post",
                 "content": "Test Content",
                 "topic": topic_fixture.pk,
+                "image": image,
             },
         )
         add_permission = Permission.objects.get(
@@ -440,9 +464,14 @@ class TestBlogCreateView:
         user_fixture.user_permissions.add(add_permission)
         request.user = user_fixture
         response = BlogPostCreateView.as_view()(request)
+        blog_post = BlogPost.objects.first()
+        stored_image = Path(blog_post.image.storage.location)
+        stored_image = stored_image / blog_post.image.name
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == reverse_lazy("blog:post_list")
         assert BlogPost.objects.filter(title="Test Post").exists() is True
+        assert stored_image.exists() is True
+        stored_image.unlink()
 
 
 class TestBlogUpdateView:
