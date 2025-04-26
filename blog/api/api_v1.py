@@ -38,12 +38,12 @@ class BlogPostIn(Schema):
     """BlogPost API input schema."""
 
     title: str
-    topic: int | None = None
+    topic: int | None
     content: str
-    previous: int | None = ""
+    previous: int | None
 
 
-class BlogPostPathIn(Schema):
+class BlogPostPatchIn(Schema):
     """BlogPost API input schema."""
 
     title: str = ""
@@ -254,7 +254,11 @@ def detail_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:  # noq
 @router.post(
     "/blog_post",
     url_name="blog_post_create",
-    response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
+    response={
+        HTTPStatus.OK: BlogPostOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.UNAUTHORIZED: Message,
+    },
 )
 def create_blog_post(
     request: HttpRequest,
@@ -271,6 +275,8 @@ def create_blog_post(
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.add_blogpost"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     topic = get_object_or_404(Topic, pk=payload.topic)
     post = BlogPost.objects.create(
         title=payload.title, topic=topic, author=request.user, content=payload.content
@@ -290,10 +296,14 @@ def create_blog_post(
 @router.put(
     "/blog_post/{post_id}",
     url_name="blog_post_update",
-    response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
+    response={
+        HTTPStatus.OK: BlogPostOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.UNAUTHORIZED: Message,
+    },
 )
 def update_blog_post(
-    request: HttpRequest,  # noqa: ARG001
+    request: HttpRequest,
     post_id: int,
     payload: BlogPostIn,
 ) -> HttpResponse:
@@ -307,6 +317,8 @@ def update_blog_post(
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.change_blogpost"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     topic = get_object_or_404(Topic, pk=payload.topic)
     post = get_object_or_404(BlogPost, pk=post_id)
     post.title = payload.title
@@ -322,12 +334,16 @@ def update_blog_post(
 @router.patch(
     "/blog_post/{post_id}",
     url_name="blog_post_patch",
-    response={HTTPStatus.OK: BlogPostOut, HTTPStatus.BAD_REQUEST: Message},
+    response={
+        HTTPStatus.OK: BlogPostOut,
+        HTTPStatus.BAD_REQUEST: Message,
+        HTTPStatus.UNAUTHORIZED: Message,
+    },
 )
 def patch_blog_post(
-    request: HttpRequest,  # noqa: ARG001
+    request: HttpRequest,
     post_id: int,
-    payload: BlogPostPathIn,
+    payload: BlogPostPatchIn,
 ) -> HttpResponse:
     """Topic patch API.
 
@@ -339,6 +355,8 @@ def patch_blog_post(
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.change_blogpost"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     post = get_object_or_404(BlogPost, pk=post_id)
     if payload.title:
         post.title = payload.title
@@ -354,8 +372,16 @@ def patch_blog_post(
     return HTTPStatus.OK, post
 
 
-@router.delete("/blog_post/{post_id}", url_name="blog_post_delete")
-def delete_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:  # noqa:ARG001
+@router.delete(
+    "/blog_post/{post_id}",
+    url_name="blog_post_delete",
+    response={
+        HTTPStatus.UNAUTHORIZED: Message,
+        HTTPStatus.NO_CONTENT: None,
+        HTTPStatus.OK: None,
+    },
+)
+def delete_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:
     """Topic delete API.
 
     Args:
@@ -365,6 +391,8 @@ def delete_blog_post(request: HttpRequest, post_id: int) -> HttpResponse:  # noq
     Returns:
         HttpResponse: HttpResponse object.
     """
+    if not request.user.has_perm("blog.delete_blogpost"):
+        return HTTPStatus.UNAUTHORIZED, {"message": NO_PERMISSION}
     post = get_object_or_404(BlogPost, pk=post_id)
     post.delete()
-    return HTTPStatus.OK
+    return HTTPStatus.NO_CONTENT, None

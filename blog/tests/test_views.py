@@ -1,4 +1,3 @@
-import shutil
 from http import HTTPStatus
 from pathlib import Path
 
@@ -22,7 +21,6 @@ from blog.views import (
     TopicListView,
     TopicUpdateView,
 )
-from main_project.settings import MEDIA_ROOT
 
 pytestmark = pytest.mark.django_db
 request_factory = RequestFactory()
@@ -308,7 +306,7 @@ class TestBlogListView:
     """Tests for Post List View."""
 
     @staticmethod
-    def test_view_normal(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_view_normal(blog_post_fixture: BlogPost, user_fixture: User) -> None:
         """Test view from normal request."""
         url = reverse_lazy("blog:post_list")
         request = request_factory.get(url)
@@ -316,12 +314,12 @@ class TestBlogListView:
         response = BlogPostListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/post_list.html"
-        assert post_fixture in response.context_data["object_list"]
+        assert blog_post_fixture in response.context_data["object_list"]
 
     @staticmethod
     def test_view_htmx(
-        post_fixture: BlogPost,  # noqa: ARG004
-        post_fixture2: BlogPost,  # noqa: ARG004
+        blog_post_fixture: BlogPost,  # noqa: ARG004
+        blog_post_fixture2: BlogPost,  # noqa: ARG004
         user_fixture: User,
     ) -> None:
         """Test view from HTMX."""
@@ -337,8 +335,8 @@ class TestBlogListView:
 
     @staticmethod
     def test_view_htmx_search(
-        post_fixture: BlogPost,  # noqa: ARG004
-        post_fixture2: BlogPost,  # noqa: ARG004
+        blog_post_fixture: BlogPost,  # noqa: ARG004
+        blog_post_fixture2: BlogPost,  # noqa: ARG004
         user_fixture: User,
     ) -> None:
         """Test view from HTMX with search."""
@@ -367,12 +365,6 @@ class TestBlogListView:
 
 class TestBlogCreateView:
     """Tests for Post Create View."""
-
-    def teardown_method() -> None:
-        """Called after each test method to celan up folder."""
-        path = Path(MEDIA_ROOT)
-        if path.exists and path.is_dir:
-            shutil.rmtree(path=path)
 
     @staticmethod
     def test_get_view_not_logged() -> None:
@@ -433,29 +425,20 @@ class TestBlogCreateView:
             BlogPostCreateView.as_view()(request)
 
     @staticmethod
-    def test_blogpost_view(user_fixture: User, topic_fixture: Topic) -> None:
+    def test_blogpost_view(
+        user_fixture: User,
+        topic_fixture: Topic,
+        image_upload_fixture: SimpleUploadedFile,
+    ) -> None:
         """Test post create view with permission."""
         url = reverse_lazy("blog:post_create")
-        cwd = Path().cwd()
-        image_path = (
-            cwd
-            / "authentication"
-            / "static"
-            / "authentication"
-            / "img"
-            / "blank_profile.jpg"
-        )
-        with image_path.open("rb") as file:
-            image = SimpleUploadedFile(
-                "image.jpg", file.read(), content_type="image/jpeg"
-            )
         request = request_factory.post(
             url,
             data={
                 "title": "Test Post",
                 "content": "Test Content",
                 "topic": topic_fixture.pk,
-                "image": image,
+                "image": image_upload_fixture,
             },
         )
         add_permission = Permission.objects.get(
@@ -471,79 +454,80 @@ class TestBlogCreateView:
         assert response.url == reverse_lazy("blog:post_list")
         assert BlogPost.objects.filter(title="Test Post").exists() is True
         assert stored_image.exists() is True
-        stored_image.unlink()
 
 
 class TestBlogUpdateView:
     """Tests for Post Update View."""
 
     @staticmethod
-    def test_get_view_not_logged(post_fixture: BlogPost) -> None:
+    def test_get_view_not_logged(blog_post_fixture: BlogPost) -> None:
         """Test get update view without logging in."""
-        url = reverse_lazy("blog:post_update", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_update", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         request.user = AnonymousUser()
-        response = BlogPostUpdateView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostUpdateView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.FOUND
-        assert response.url == f"/login?next=/blog/post_update/{post_fixture.pk}"
+        assert response.url == f"/login?next=/blog/post_update/{blog_post_fixture.pk}"
 
     @staticmethod
-    def test_get_view_forbidden(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_get_view_forbidden(
+        blog_post_fixture: BlogPost, user_fixture: User
+    ) -> None:
         """Test get update view logged in without permission."""
-        url = reverse_lazy("blog:post_update", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_update", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         request.user = user_fixture
         with pytest.raises(PermissionDenied):
-            BlogPostUpdateView.as_view()(request, pk=post_fixture.pk)
+            BlogPostUpdateView.as_view()(request, pk=blog_post_fixture.pk)
 
     @staticmethod
-    def test_get_view(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_get_view(blog_post_fixture: BlogPost, user_fixture: User) -> None:
         """Test get update view with permission."""
-        url = reverse_lazy("blog:post_update", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_update", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         change_permission = Permission.objects.get(
             codename="change_blogpost", content_type__app_label="blog"
         )
         user_fixture.user_permissions.add(change_permission)
         request.user = user_fixture
-        response = BlogPostUpdateView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostUpdateView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == ["blog/post_update.html"]
-        assert response.context_data["post"] == post_fixture
+        assert response.context_data["post"] == blog_post_fixture
         assert "topics" in response.context_data
         assert "posts" in response.context_data
 
     @staticmethod
-    def test_blogpost_view_not_logged(post_fixture: BlogPost) -> None:
+    def test_blogpost_view_not_logged(blog_post_fixture: BlogPost) -> None:
         """Test post update view without logging in."""
-        url = reverse_lazy("blog:post_update", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_update", args=[blog_post_fixture.pk])
         request = request_factory.post(
             url, data={"title": "Updated Post", "content": "Updated Content"}
         )
         request.user = AnonymousUser()
-        response = BlogPostUpdateView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostUpdateView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.FOUND
-        assert response.url == f"/login?next=/blog/post_update/{post_fixture.pk}"
+        assert response.url == f"/login?next=/blog/post_update/{blog_post_fixture.pk}"
 
     @staticmethod
     def test_blogpost_view_forbidden(
-        post_fixture: BlogPost, user_fixture: User
+        blog_post_fixture: BlogPost, user_fixture: User
     ) -> None:
         """Test post update view logged in without permission."""
-        url = reverse_lazy("blog:post_update", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_update", args=[blog_post_fixture.pk])
         request = request_factory.post(
             url, data={"title": "Updated Post", "content": "Updated Content"}
         )
         request.user = user_fixture
         with pytest.raises(PermissionDenied):
-            BlogPostUpdateView.as_view()(request, pk=post_fixture.pk)
+            BlogPostUpdateView.as_view()(request, pk=blog_post_fixture.pk)
 
     @staticmethod
     def test_blogpost_view(
-        post_fixture: BlogPost, user_fixture: User, topic_fixture: Topic
+        blog_post_fixture: BlogPost, user_fixture: User, topic_fixture: Topic
     ) -> None:
         """Test post update view with permission."""
-        url = reverse_lazy("blog:post_update", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_update", args=[blog_post_fixture.pk])
         data = {
             "title": "Updated Post",
             "content": "Updated Content",
@@ -555,97 +539,101 @@ class TestBlogUpdateView:
         )
         user_fixture.user_permissions.add(change_permission)
         request.user = user_fixture
-        response = BlogPostUpdateView.as_view()(request, pk=post_fixture.pk)
-        post_fixture.refresh_from_db()
+        response = BlogPostUpdateView.as_view()(request, pk=blog_post_fixture.pk)
+        blog_post_fixture.refresh_from_db()
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == reverse_lazy("blog:post_list")
-        assert post_fixture.title == "Updated Post"
-        assert post_fixture.content == "Updated Content"
-        assert post_fixture.topic == topic_fixture
+        assert blog_post_fixture.title == "Updated Post"
+        assert blog_post_fixture.content == "Updated Content"
+        assert blog_post_fixture.topic == topic_fixture
 
 
 class TestBlogPostDetailView:
     """Tests for Post Detail View."""
 
     @staticmethod
-    def test_get_view(post_fixture: BlogPost) -> None:
+    def test_get_view(blog_post_fixture: BlogPost) -> None:
         """Test detail view with logged-in user."""
-        url = reverse_lazy("blog:post_detail", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_detail", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         request.user = AnonymousUser()
-        response = BlogPostDetailView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostDetailView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == ["blog/post_detail.html"]
-        assert response.context_data["post"] == post_fixture
+        assert response.context_data["post"] == blog_post_fixture
 
 
 class TestBlogPostDeleteView:
     """Tests for Post Delete View."""
 
     @staticmethod
-    def test_get_view_not_logged(post_fixture: BlogPost) -> None:
+    def test_get_view_not_logged(blog_post_fixture: BlogPost) -> None:
         """Test get delete view without logging in."""
-        url = reverse_lazy("blog:post_delete", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_delete", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         request.user = AnonymousUser()
-        response = BlogPostDeleteView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostDeleteView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.FOUND
-        assert response.url == f"/login?next=/blog/post_delete/{post_fixture.pk}"
+        assert response.url == f"/login?next=/blog/post_delete/{blog_post_fixture.pk}"
 
     @staticmethod
-    def test_get_view_forbidden(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_get_view_forbidden(
+        blog_post_fixture: BlogPost, user_fixture: User
+    ) -> None:
         """Test get delete view logged in without permission."""
-        url = reverse_lazy("blog:post_delete", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_delete", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         request.user = user_fixture
         with pytest.raises(PermissionDenied):
-            BlogPostDeleteView.as_view()(request, pk=post_fixture.pk)
+            BlogPostDeleteView.as_view()(request, pk=blog_post_fixture.pk)
 
     @staticmethod
-    def test_get_view(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_get_view(blog_post_fixture: BlogPost, user_fixture: User) -> None:
         """Test get delete view with permission."""
-        url = reverse_lazy("blog:post_delete", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_delete", args=[blog_post_fixture.pk])
         request = request_factory.get(url)
         delete_permission = Permission.objects.get(
             codename="delete_blogpost", content_type__app_label="blog"
         )
         user_fixture.user_permissions.add(delete_permission)
         request.user = user_fixture
-        response = BlogPostDeleteView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostDeleteView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == ["blog/post_confirm_delete.html"]
-        assert response.context_data["post"] == post_fixture
+        assert response.context_data["post"] == blog_post_fixture
 
     @staticmethod
-    def test_post_view_not_logged(post_fixture: BlogPost) -> None:
+    def test_post_view_not_logged(blog_post_fixture: BlogPost) -> None:
         """Test post delete view without logging in."""
-        url = reverse_lazy("blog:post_delete", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_delete", args=[blog_post_fixture.pk])
         request = request_factory.post(url)
         request.user = AnonymousUser()
-        response = BlogPostDeleteView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostDeleteView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.FOUND
-        assert response.url == f"/login?next=/blog/post_delete/{post_fixture.pk}"
+        assert response.url == f"/login?next=/blog/post_delete/{blog_post_fixture.pk}"
 
     @staticmethod
-    def test_post_view_forbidden(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_post_view_forbidden(
+        blog_post_fixture: BlogPost, user_fixture: User
+    ) -> None:
         """Test post delete view logged in without permission."""
-        url = reverse_lazy("blog:post_delete", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_delete", args=[blog_post_fixture.pk])
         request = request_factory.post(url)
         request.user = user_fixture
         with pytest.raises(PermissionDenied):
-            BlogPostDeleteView.as_view()(request, pk=post_fixture.pk)
+            BlogPostDeleteView.as_view()(request, pk=blog_post_fixture.pk)
 
     @staticmethod
-    def test_post_view(post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_post_view(blog_post_fixture: BlogPost, user_fixture: User) -> None:
         """Test post delete view with permission."""
-        url = reverse_lazy("blog:post_delete", args=[post_fixture.pk])
+        url = reverse_lazy("blog:post_delete", args=[blog_post_fixture.pk])
         request = request_factory.post(url)
         delete_permission = Permission.objects.get(
             codename="delete_blogpost", content_type__app_label="blog"
         )
         user_fixture.user_permissions.add(delete_permission)
         request.user = user_fixture
-        response = BlogPostDeleteView.as_view()(request, pk=post_fixture.pk)
+        response = BlogPostDeleteView.as_view()(request, pk=blog_post_fixture.pk)
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == reverse_lazy("blog:post_list")
-        assert BlogPost.objects.filter(pk=post_fixture.pk).exists() is False
+        assert BlogPost.objects.filter(pk=blog_post_fixture.pk).exists() is False

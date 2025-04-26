@@ -13,10 +13,10 @@ class TestTopicModel:
     @staticmethod
     def test_create_topic() -> None:
         """Test create Topic."""
-        topic = Topic(name="test")
-        topic.save()
-        assert len(Topic.objects.all()) == 1
-        assert Topic.objects.all()[0] == topic
+        assert Topic.objects.exists() is False
+        topic = Topic.objects.create(name="test")
+        assert Topic.objects.exists() is True
+        assert Topic.objects.first() == topic
 
     @staticmethod
     def test_name_is_unique(topic_fixture: Topic) -> None:
@@ -32,9 +32,10 @@ class TestPostModel:
     @staticmethod
     def test_create_post(topic_fixture: Topic, user_fixture: User) -> None:
         """Test post creation."""
+        assert BlogPost.objects.exists() is False
         post = BlogPost(
             title="Test", topic=topic_fixture, author=user_fixture, content="content"
         )
         post.save()
-        assert len(BlogPost.objects.all()) == 1
-        assert BlogPost.objects.all()[0] == post
+        assert BlogPost.objects.exists() is True
+        assert BlogPost.objects.first() == post

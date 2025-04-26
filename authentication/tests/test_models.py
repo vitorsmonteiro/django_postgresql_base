@@ -7,18 +7,19 @@ pytestmark = pytest.mark.django_db
 
 def test_create_user() -> None:
     """Test basic user creation."""
+    assert User.objects.exists() is False
     user = User(first_name="foo", last_name="bar", email="user@email.com")
     user.set_password("Test*123456")
     user.save()
-    assert len(User.objects.all()) == 1
+    assert User.objects.exists() is True
 
 
-def test_delete_user() -> None:
+def test_delete_user(user_fixture: User) -> None:
     """Test basic user delete."""
-    user = User(first_name="foo", last_name="bar", email="user@email.com")
-    user.set_password("Test*123456")
-    user.save()
-    assert len(User.objects.all()) == 1
+    assert User.objects.exists() is True
+    user_fixture.delete()
+    assert User.objects.exists() is False
+
 
 
 class TestUserManager:
@@ -27,13 +28,14 @@ class TestUserManager:
     @staticmethod
     def test_create_user() -> None:
         """Test basic user creation with UserManager."""
+        assert User.objects.exists() is False
         user: User = User.objects.create_user(
             first_name="foo",
             last_name="bar",
             email="user@email.com",
             password="Test*123456",  # noqa: S106
         )
-        assert len(User.objects.all()) == 1
+        assert User.objects.exists() is True
         assert user.is_staff is False
         assert user.is_superuser is False
 
@@ -51,12 +53,13 @@ class TestUserManager:
     @staticmethod
     def test_create_superuser() -> None:
         """Test superuser creation with UserManager."""
+        assert User.objects.exists() is False
         user: User = User.objects.create_superuser(
             first_name="foo",
             last_name="bar",
             email="user@email.com",
             password="Test*123456",  # noqa: S106
         )
-        assert len(User.objects.all()) == 1
+        assert User.objects.exists() is True
         assert user.is_staff is True
         assert user.is_superuser is True

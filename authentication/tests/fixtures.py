@@ -1,6 +1,12 @@
+import shutil
+from collections.abc import Generator
+from pathlib import Path
+
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from authentication.models import User
+from main_project.settings import MEDIA_ROOT
 
 pytestmark = pytest.mark.django_db
 
@@ -29,3 +35,23 @@ def user_fixture2() -> User:
     user.set_password(USER_PASSWORD)
     user.save()
     return user
+
+
+@pytest.fixture
+def image_upload_fixture() -> Generator[SimpleUploadedFile]:
+    """Image upload fixture."""
+    path = Path().cwd()
+    path = (
+        path
+        / "authentication"
+        / "static"
+        / "authentication"
+        / "img"
+        / "blank_profile.jpg"
+    )
+    with path.open("rb") as file:
+        image = SimpleUploadedFile("image.jpg", file.read(), content_type="image/jpeg")
+    yield image
+    path = Path(MEDIA_ROOT)
+    if path.exists and path.is_dir:
+        shutil.rmtree(path=path)

@@ -1,4 +1,3 @@
-import shutil
 from http import HTTPStatus
 from pathlib import Path
 
@@ -9,7 +8,6 @@ from django.urls import reverse_lazy
 
 from authentication.models import User
 from authentication.tests.fixtures import USER_PASSWORD
-from main_project.settings import MEDIA_ROOT
 
 pytestmark = pytest.mark.django_db
 
@@ -67,13 +65,6 @@ class TestCreateUserView:
     """Test create_user view."""
 
     @staticmethod
-    def teardown_method() -> None:
-        """Called after each test method to celan up folder."""
-        path = Path(MEDIA_ROOT)
-        if path.exists and path.is_dir:
-            shutil.rmtree(path=path)
-
-    @staticmethod
     def test_get_view(client: Client) -> None:
         """Test get view."""
         url = reverse_lazy("authentication:create_user")
@@ -81,42 +72,32 @@ class TestCreateUserView:
         assert ressponse.status_code == HTTPStatus.OK
 
     @staticmethod
-    def test_post_view_ok(client: Client) -> None:
+    def test_post_view_ok(
+        client: Client, image_upload_fixture: SimpleUploadedFile
+    ) -> None:
         """Test post view ok."""
+        assert User.objects.exists() is False
         url = reverse_lazy("authentication:create_user")
-        path = Path().cwd()
-        path = (
-            path
-            / "authentication"
-            / "static"
-            / "authentication"
-            / "img"
-            / "blank_profile.jpg"
-        )
-        with path.open("rb") as file:
-            image = SimpleUploadedFile(
-                "image.jpg", file.read(), content_type="image/jpeg"
-            )
+
         data = {
             "first_name": "foo",
             "last_name": "bar",
             "email": "foo@bar.com",
             "password1": "123456*Test",
             "password2": "123456*Test",
-            "profile_image": image,
+            "profile_image": image_upload_fixture,
         }
         response = client.post(url, data=data)
         user = User.objects.first()
         stored_image = Path(user.profile_image.storage.location)
         stored_image = stored_image / user.profile_image.name
         assert response.status_code == HTTPStatus.FOUND
-        assert len(User.objects.all()) == 1
-        user = User.objects.all()[0]
+        assert User.objects.exists() is True
+        user = User.objects.first()
         assert user.first_name == data["first_name"]
         assert user.last_name == data["last_name"]
         assert user.email == data["email"]
         assert stored_image.exists() is True
-        stored_image.unlink()
 
     @staticmethod
     def test_post_view_nok(client: Client) -> None:
@@ -187,6 +168,7 @@ class TestDeleteAccountView:
     @staticmethod
     def test_post_view(client: Client, user_fixture: User) -> None:
         """Test get view."""
+        assert User.objects.exists() is True
         login_url = reverse_lazy("authentication:login")
         client.post(
             login_url, data={"email": user_fixture.email, "password": USER_PASSWORD}
@@ -194,18 +176,11 @@ class TestDeleteAccountView:
         url = reverse_lazy("authentication:delete_account")
         response = client.post(url)
         assert response.status_code == HTTPStatus.FOUND
-        assert len(User.objects.all()) == 0
+        assert User.objects.exists() is False
 
 
 class TestEditUserView:
     """Test edit_user view."""
-
-    @staticmethod
-    def teardown_method() -> None:
-        """Called after each test method to celan up folder."""
-        path = Path(MEDIA_ROOT)
-        if path.exists and path.is_dir:
-            shutil.rmtree(path=path)
 
     @staticmethod
     def test_get_view(client: Client, user_fixture: User) -> None:
@@ -219,30 +194,22 @@ class TestEditUserView:
         assert ressponse.status_code == HTTPStatus.OK
 
     @staticmethod
-    def test_post_view_ok(client: Client, user_fixture: User) -> None:
+    def test_post_view_ok(
+        client: Client, user_fixture: User, image_upload_fixture: SimpleUploadedFile
+    ) -> None:
         """Test post view ok."""
         login_url = reverse_lazy("authentication:login")
         client.post(
             login_url, data={"email": user_fixture.email, "password": USER_PASSWORD}
         )
         url = reverse_lazy("authentication:edit_user")
-        path = Path.cwd()
-        path = (
-            path
-            / "authentication"
-            / "static"
-            / "authentication"
-            / "img"
-            / "blank_profile.jpg"
-        )
-        with path.open("rb") as img:
-            data = {
-                "first_name": "foo",
-                "last_name": "bar",
-                "email": "foo@bar.com",
-                "profile_image": img,
-            }
-            response = client.post(url, data=data)
+        data = {
+            "first_name": "foo",
+            "last_name": "bar",
+            "email": "foo@bar.com",
+            "profile_image": image_upload_fixture,
+        }
+        response = client.post(url, data=data)
         assert response.status_code == HTTPStatus.FOUND
         assert user_fixture.first_name == data["first_name"]
         assert user_fixture.last_name == data["last_name"]

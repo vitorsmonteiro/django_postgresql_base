@@ -93,6 +93,7 @@ class TestCreateAPI:
     @staticmethod
     def test_create_api(client: Client, user_fixture: User) -> None:
         """Test create api."""
+        assert Task.objects.exists() is False
         data = {"title": "title", "description": "description", "status": "new"}
         url = reverse_lazy("api-1.0.0:task_create")
         response = client.post(
@@ -111,7 +112,7 @@ class TestCreateAPI:
             "created_at": task.created_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ")[:-4] + "Z",
             "updated_at": task.updated_at.strftime("%Y-%m-%dT%H:%M:%S.%fZ")[:-4] + "Z",
         }
-        assert len(Task.objects.all()) == 1
+        assert Task.objects.exists() is True
         assert response.status_code == HTTPStatus.OK
         assert response.json() == excpected
 
@@ -126,7 +127,7 @@ class TestCreateAPI:
             data=json.dumps(data),
             content_type="application/json",
         )
-        assert len(Task.objects.all()) == 0
+        assert Task.objects.exists() is False
         assert response.status_code == HTTPStatus.UNPROCESSABLE_CONTENT
         assert response.json() == {
             "detail": [
@@ -377,14 +378,14 @@ class TestDeleteAPI:
     @staticmethod
     def test_delete_api(client: Client, user_fixture: User, task_fixture: Task) -> None:
         """Test delete api."""
-        assert len(Task.objects.all()) == 1
+        assert Task.objects.exists() is True
         url = reverse_lazy("api-1.0.0:task_delete", args=[task_fixture.pk])
         response = client.delete(
             url, headers={"Authorization": f"Bearer {user_fixture.token}"}
         )
+        assert Task.objects.exists() is False
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {"message": "success"}
-        assert len(Task.objects.all()) == 0
 
     @staticmethod
     def test_delete_api_with_different_user(

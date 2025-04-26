@@ -8,6 +8,7 @@ pytestmark = pytest.mark.django_db
 
 def test_create_task(user_fixture: User) -> None:
     """Test create Task."""
+    assert Task.objects.exists() is False
     task = Task(
         title="Fixture task",
         description="Test fixture",
@@ -15,5 +16,5 @@ def test_create_task(user_fixture: User) -> None:
         status="new",
     )
     task.save()
-    assert len(Task.objects.all()) == 1
-    assert Task.objects.all()[0] == task
+    assert Task.objects.exists() is True
+    assert Task.objects.first() == task

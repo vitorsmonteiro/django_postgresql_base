@@ -125,7 +125,7 @@ source = ["."]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "main_project.settings"
-addopts = "-p no:warnings --create-db -v --cov"
+addopts = "-p no:warnings --create-db -vv --cov"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 
 [tool.coverage.report]

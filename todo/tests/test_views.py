@@ -337,7 +337,7 @@ class TestDeleteView:
         client: Client, user_fixture: User, task_fixture: Task
     ) -> None:
         """Test delete post view."""
-        assert len(Task.objects.all()) == 1
+        assert Task.objects.exists() is True
         login_url = reverse_lazy("authentication:login")
         client.post(
             login_url, data={"email": user_fixture.email, "password": USER_PASSWORD}
@@ -345,7 +345,7 @@ class TestDeleteView:
         url = reverse_lazy("todo:task_delete", args=[task_fixture.pk])
         response = client.delete(url, args=[task_fixture.pk])
         assert response.status_code == HTTPStatus.FOUND
-        assert len(Task.objects.all()) == 0
+        assert Task.objects.exists() is False
 
     @staticmethod
     def test_delete_post_view_different_user(

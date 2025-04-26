@@ -23,8 +23,8 @@ def topic_fixture2(topic_fixture: Topic) -> Topic:
 
 
 @pytest.fixture
-def post_fixture(topic_fixture: Topic, user_fixture: User) -> BlogPost:
-    """Post fixture."""
+def blog_post_fixture(topic_fixture: Topic, user_fixture: User) -> BlogPost:
+    """Blog post fixture."""
     post = BlogPost(
         title="Test", topic=topic_fixture, author=user_fixture, content="content"
     )
@@ -33,10 +33,13 @@ def post_fixture(topic_fixture: Topic, user_fixture: User) -> BlogPost:
 
 
 @pytest.fixture
-def post_fixture2(topic_fixture2: Topic, user_fixture: User) -> BlogPost:
-    """Post fixture."""
+def blog_post_fixture2(topic_fixture2: Topic, user_fixture: User) -> BlogPost:
+    """Blog post fixture 2."""
     post = BlogPost(
-        title="Test2", topic=topic_fixture2, author=user_fixture, content="content2"
+        title="Another test",
+        topic=topic_fixture2,
+        author=user_fixture,
+        content="content2",
     )
     post.save()
     return post
