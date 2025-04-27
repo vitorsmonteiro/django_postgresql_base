@@ -3,12 +3,12 @@
         <div class="row">
             {% for post in page_obj %}
                 <div class="col">
-                    <div class="card post-card">
+                    <div class="card post-card mt-3">
                         <img src="{{ post.image.url }}"
                              alt="{{ post.title }} image"
                              class="card-img-top"
-                             height="200"
-                             width="200">
+                             height="150"
+                             width="150">
                         <div class="card-body">
                             <h5 class="card-title">
                                 <a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a>

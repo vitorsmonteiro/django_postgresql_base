@@ -24,7 +24,7 @@
                        required />
             </div>
             <div class="input-group mb-3">
-                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Topic</label>
+                <label class="input-group-text" id="basic-addon3">Topic</label>
                 <select name="topic" class="form-control">
                     {% for topic in topics %}
                         <option value="{{ topic.pk }}" {% if topic == post.topic %}selected{% endif %}>{{ topic }}</option>
@@ -37,7 +37,7 @@
                 <input type="file" name="image" class="form-control" />
             </div>
             <div class="input-group mb-3">
-                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Previous post</label>
+                <label class="input-group-text" id="basic-addon3">Previous post</label>
                 <select name="previous" class="form-control">
                     {% for pt in posts %}
                         <option value="{{ pt.pk }}" {% if pt == post.previous %}selected{% endif %}>{{ pt }}</option>

@@ -20,7 +20,7 @@
                 <input type="text" name="name" class="form-control" required />
             </div>
             <div class="input-group mb-3">
-                <label class="input-group-text" id="basic-addon3" for="inputGroupSelect01">Parent topic</label>
+                <label class="input-group-text" id="basic-addon3">Parent topic</label>
                 <select name="parent_topic" class="form-control">
                     <option selected value="">--</option>
                     {% for choice in topic_choices %}<option value="{{ choice.pk }}">{{ choice.name }}</option>{% endfor %}

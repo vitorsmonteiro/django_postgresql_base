@@ -5,13 +5,21 @@
 {% block content %}
     <h1>Posts</h1>
     <div class="container">
-        <input class="form-control"
-               type="search"
-               name="search"
-               placeholder="Begin typing To search posts..."
-               hx-get="{% url 'blog:post_list' %}"
-               hx-trigger="input changed delay:100ms, keyup[key=='Enter'], load"
-               hx-target="#blog-result">
+        <div class="input-group mb-3">
+            <label class="input-group-text" id="basic-addon3">Topic</label>
+            <select class="form-select"
+                    name="topic"
+                    hx-get="{% url 'blog:post_list' %}"
+                    hx-include="[name='topic']"
+                    hx-trigger="change"
+                    hx-target="#blog-result">
+                <option {% if not request.GET.topic %}selected{% endif %} value=""></option>
+                {% for topic in topics %}
+                    <option value="{{ topic.pk }}"
+                            {% if request.GET.topic == topic.pk %}selected{% endif %}>{{ topic.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
     <div class="container mt-3">{% include "blog/components/post_table.html" %}</div>
 {% endblock content %}

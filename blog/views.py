@@ -103,9 +103,17 @@ class BlogPostListView(LoginRequiredMixin, ListView):
         query_set = BlogPost.objects.all()
         query_set = query_set.order_by("title")
         if self.request.headers.get("Hx-Request", False):
-            search = self.request.GET.get("search", "")
-            query_set = query_set.filter(title__startswith=search)
+            if search := self.request.GET.get("search"):
+                query_set = query_set.filter(title__startswith=search)
+            if topic := self.request.GET.get("topic"):
+                query_set = query_set.filter(topic=topic)
         return query_set
+
+    def get_context_data(self: Self, **kwargs: str) -> dict:
+        """Override to pass extra context."""
+        context = super().get_context_data(**kwargs)
+        context["topics"] = Topic.objects.all()
+        return context
 
 
 class BlogPostCreateView(PermissionRequiredMixin, CreateView):
