@@ -8,7 +8,9 @@ pytestmark = pytest.mark.django_db
 def test_create_user() -> None:
     """Test basic user creation."""
     assert User.objects.exists() is False
-    user = User(first_name="foo", last_name="bar", email="user@email.com")
+    user = User.objects.create(
+        first_name="foo", last_name="bar", email="user@email.com"
+    )
     user.set_password("Test*123456")
     user.save()
     assert User.objects.exists() is True
@@ -19,7 +21,6 @@ def test_delete_user(user_fixture: User) -> None:
     assert User.objects.exists() is True
     user_fixture.delete()
     assert User.objects.exists() is False
-
 
 
 class TestUserManager:

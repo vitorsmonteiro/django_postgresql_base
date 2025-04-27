@@ -66,7 +66,7 @@ def create_user(request: HttpRequest) -> HttpResponse:
     form = CreateUserForm(request.POST, request.FILES)
     if form.is_valid():
         profile_image: UploadedFile = form.cleaned_data.get("profile_image")
-        user = User(
+        user = User.objects.create(
             first_name=form.cleaned_data["first_name"],
             last_name=form.cleaned_data["last_name"],
             email=form.cleaned_data["email"],

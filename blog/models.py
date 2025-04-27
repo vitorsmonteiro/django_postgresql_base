@@ -43,3 +43,16 @@ class BlogPost(models.Model):
             Post: Post object.
         """
         return BlogPost.objects.filter(previous=self).first()
+
+
+class Commment(models.Model):
+    """Comment model."""
+
+    blog_post: BlogPost = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+    author: User = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self: Self) -> str:
+        """String representation of the model."""
+        return f"{self.author.email} - {self.blog_post.title}"
