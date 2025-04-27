@@ -11,8 +11,7 @@
                placeholder="Begin typing To search posts..."
                hx-get="{% url 'blog:post_list' %}"
                hx-trigger="input changed delay:100ms, keyup[key=='Enter'], load"
-               hx-target="#topic-result"
-               hx-indicator=".htmx-indicator">
+               hx-target="#blog-result">
     </div>
     <div class="container mt-3">{% include "blog/components/post_table.html" %}</div>
 {% endblock content %}

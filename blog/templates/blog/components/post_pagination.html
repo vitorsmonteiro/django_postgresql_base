@@ -10,24 +10,24 @@
                 <li class="page-item">
                     <a class="page-link"
                        hx-get="{% url 'blog:post_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}"
-                       hx-target="#topic-result">Previous</a>
+                       hx-target="#blog-result">Previous</a>
                 </li>
             {% endif %}
             <li class="page-item">
                 <a class="page-link"
                    hx-get="{% url 'blog:post_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.number }}"
-                   hx-target="#topic-result">{{ page_obj.number }}</a>
+                   hx-target="#blog-result">{{ page_obj.number }}</a>
             </li>
             {% if page_obj.has_next %}
                 <li class="page-item">
                     <a class="page-link"
-                       hx-get="{% url 'blog:topic_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}"
-                       hx-target="#topic-result">Next</a>
+                       hx-get="{% url 'blog:post_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}"
+                       hx-target="#blog-result">Next</a>
                 </li>
                 <li class="page-item">
                     <a class="page-link"
                        hx-get="{% url 'blog:post_list' %}?{{ request.GET.urlencode }}&page={{ page_obj.paginator.num_pages }}"
-                       hx-target="#topic-result">Last</a>
+                       hx-target="#blog-result">Last</a>
                 </li>
             {% endif %}
         </ul>

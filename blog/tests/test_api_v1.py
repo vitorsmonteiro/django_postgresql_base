@@ -820,6 +820,7 @@ class TestPatialUpdateBlogPost:
         assert response.status_code == HTTPStatus.UNAUTHORIZED
         assert response.json() == {"message": NO_PERMISSION}
 
+
 class TestBlogPostDelete:
     """Tests for blog post delete API."""
 
