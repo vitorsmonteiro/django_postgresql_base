@@ -4,7 +4,7 @@
             {% for post in page_obj %}
                 <div class="col">
                     <div class="card post-card mt-3">
-                        <img src="{{ post.image.url }}"
+                        <img {% if post.image %} src="{{ post.image.url }}" {% else %} src=".." {% endif %}
                              alt="{{ post.title }} image"
                              class="card-img-top"
                              height="150"

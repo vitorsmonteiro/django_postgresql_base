@@ -115,7 +115,6 @@ class BlogPostListView(LoginRequiredMixin, ListView):
         context["topics"] = Topic.objects.all()
         return context
 
-
 class BlogPostCreateView(PermissionRequiredMixin, CreateView):
     """Topic generic create view."""
 
@@ -139,13 +138,14 @@ class BlogPostCreateView(PermissionRequiredMixin, CreateView):
             topic = form.cleaned_data["topic"]
             author = self.request.user
             content = form.cleaned_data["content"]
-            previous_id = form.cleaned_data.get("previous")
+            previous = form.cleaned_data.get("previous")
             post = BlogPost.objects.create(
-                title=title, topic=topic, author=author, content=content
+                title=title,
+                topic=topic,
+                author=author,
+                content=content,
+                previous=previous,
             )
-            if previous_id:
-                previous = BlogPost.objects.get(pk=previous_id)
-                post.previous = previous
             image: UploadedFile = form.cleaned_data.get("image")
             if image:
                 extension = image.name.split(".")[-1]

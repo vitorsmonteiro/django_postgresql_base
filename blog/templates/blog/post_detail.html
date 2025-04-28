@@ -2,24 +2,33 @@
 {% load blog_tags %}
 {% load static %}
 {% block content %}
-    <div>
-        <h1>{{ post.title }}</h1>
-        <img src="{{ post.image.url }}"
+    <div class="card border border-3">
+        <div class="card-header text-center">
+            <h1>{{ post.title }}</h1>
+        </div>
+        <img {% if post.image %} src="{{ post.image.url }}" {% else %} src=".." {% endif %}
              alt="{{ post.title }} image"
-             height="300"
-             width="600" />
-    </div>
-    <div>
-        <span>{{ post.author.first_name }} {{ post.author.last_name }}</span>
-        <span>{{ post.creates_at }}</span>
-    </div>
-    <div>{{ post.content | markdown_content }}</div>
-    <div>
-        {% if post.previous %}
-            <span><a href="{% url 'blog:post_detail' post.previous.pk %}">Previous</a></span>
-        {% endif %}
-        {% if post.next %}
-            <span><a href="{% url 'blog:post_detail' post.next.pk %}">Previous</a></span>
-        {% endif %}
+             height="450"
+             width="450"
+             class="card-img-top"
+             alt="{{ post.title }} image">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item text-end">Topic: {{ post.topic }}</li>
+            <li class="list-group-item text-end">Author: {{ post.author.first_name }} {{ post.author.last_name }}</li>
+            <li class="list-group-item text-end">Created at: {{ post.created_at }}</li>
+        </ul>
+        <div class="card-body">
+            <p class="card-text">{{ post.content | markdown_content }}</p>
+        </div>
+        <div class="card-body text-end">
+            {% if post.previous %}
+                <a href="{% url 'blog:post_detail' post.previous.pk %}"
+                   class="card-link btn btn-primary">Previous</a>
+            {% endif %}
+            {% if post.next %}
+                <a href="{% url 'blog:post_detail' post.next.pk %}"
+                   class="card-link  btn btn-primary">Next</a>
+            {% endif %}
+        </div>
     </div>
 {% endblock content %}
