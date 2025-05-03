@@ -3,11 +3,11 @@ from pathlib import Path
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from blog.models import BlogPost, Commment
+from blog.models import BlogPost, Comment
 from blog.tasks import send_email
 
 
-@receiver(post_save, sender=Commment)
+@receiver(post_save, sender=Comment)
 def notification_email(sender: BlogPost, instance: BlogPost, **kwargs: str) -> None:  # noqa:ARG001
     """Send email when comment is saved."""
     send_email.delay_on_commit(instance.pk)

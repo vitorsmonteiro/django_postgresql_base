@@ -20,4 +20,6 @@ urlpatterns = [
     path("topic_create", views.TopicCreateView.as_view(), name="topic_create"),
     path("topic_update/<int:pk>", views.TopicUpdateView.as_view(), name="topic_update"),
     path("topic_delete/<int:pk>", views.TopicDeleteView.as_view(), name="topic_delete"),
+    path("add_comment", views.add_post_comment, name="add_comment"),
+    path("remove_comment/<int:pk>", views.remove_post_comment, name="remove_comment"),
 ]

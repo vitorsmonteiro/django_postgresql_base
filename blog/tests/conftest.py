@@ -1,7 +1,7 @@
 import pytest
 
 from authentication.models import User
-from blog.models import BlogPost, Commment, Topic
+from blog.models import BlogPost, Comment, Topic
 
 pytestmark = pytest.mark.django_db
 
@@ -38,8 +38,8 @@ def blog_post_fixture2(topic_fixture2: Topic, user_fixture: User) -> BlogPost:
 
 
 @pytest.fixture
-def comment_fixture(blog_post_fixture: BlogPost, user_fixture: User) -> Commment:
+def comment_fixture(blog_post_fixture: BlogPost, user_fixture: User) -> Comment:
     """Comment fixture."""
-    return Commment.objects.create(
+    return Comment.objects.create(
         blog_post=blog_post_fixture, author=user_fixture, comment="test"
     )

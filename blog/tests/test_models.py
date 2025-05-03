@@ -2,7 +2,7 @@ import pytest
 from django.db.utils import IntegrityError
 
 from authentication.models import User
-from blog.models import BlogPost, Commment, Topic
+from blog.models import BlogPost, Comment, Topic
 
 pytestmark = pytest.mark.django_db
 
@@ -97,23 +97,23 @@ class TestCommentModel:
     @staticmethod
     def test_comment_create(blog_post_fixture: BlogPost, user_fixture: User) -> None:
         """Test comment create."""
-        assert Commment.objects.exists() is False
-        comment = Commment.objects.create(
+        assert Comment.objects.exists() is False
+        comment = Comment.objects.create(
             blog_post=blog_post_fixture, author=user_fixture, comment="foo"
         )
-        assert Commment.objects.exists() is True
-        assert Commment.objects.first() == comment
+        assert Comment.objects.exists() is True
+        assert Comment.objects.first() == comment
 
     @staticmethod
-    def test_comment_is_deleted_when_post_is_deleted(comment_fixture: Commment) -> None:
+    def test_comment_is_deleted_when_post_is_deleted(comment_fixture: Comment) -> None:
         """Test that a comment is deleted when a post is deleted."""
-        assert Commment.objects.exists() is True
+        assert Comment.objects.exists() is True
         comment_fixture.blog_post.delete()
-        assert Commment.objects.exists() is False
+        assert Comment.objects.exists() is False
 
     @staticmethod
-    def test_comment_is_deleted_when_user_is_deleted(comment_fixture: Commment) -> None:
+    def test_comment_is_deleted_when_user_is_deleted(comment_fixture: Comment) -> None:
         """Test that a comment is deleted when a user is deleted."""
-        assert Commment.objects.exists() is True
+        assert Comment.objects.exists() is True
         comment_fixture.author.delete()
-        assert Commment.objects.exists() is False
+        assert Comment.objects.exists() is False

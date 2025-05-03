@@ -1,4 +1,4 @@
-from typing import Self
+from typing import ClassVar, Self
 
 from django.db import models
 
@@ -45,13 +45,18 @@ class BlogPost(models.Model):
         return BlogPost.objects.filter(previous=self).first()
 
 
-class Commment(models.Model):
+class Comment(models.Model):
     """Comment model."""
 
     blog_post: BlogPost = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = models.TextField()
+    content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Model meta date."""
+
+        ordering: ClassVar[list[str]] = ["created_at"]
 
     def __str__(self: Self) -> str:
         """String representation of the model."""

@@ -1,9 +1,10 @@
+from http import HTTPStatus
 from typing import Any, ClassVar, Self
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import (
@@ -14,8 +15,8 @@ from django.views.generic import (
     UpdateView,
 )
 
-from blog.forms import BlogPostForm, TopicForm
-from blog.models import BlogPost, Topic
+from blog.forms import BlogPostForm, CommentForm, TopicForm
+from blog.models import BlogPost, Comment, Topic
 from main_project.settings import PAGINATION_SIZE
 
 
@@ -114,6 +115,7 @@ class BlogPostListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["topics"] = Topic.objects.all()
         return context
+
 
 class BlogPostCreateView(PermissionRequiredMixin, CreateView):
     """Topic generic create view."""
@@ -214,3 +216,42 @@ class BlogPostDeleteView(PermissionRequiredMixin, DeleteView):
     success_url = reverse_lazy("blog:post_list")
     context_object_name = "post"
     permission_required: ClassVar[list[str]] = ["blog.delete_blogpost"]
+
+
+def add_post_comment(request: HttpRequest) -> HttpResponse:
+    """Add post comment."""
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            author = request.user
+            blog_post: BlogPost = form.cleaned_data["blog_post"]
+            content = form.cleaned_data["content"]
+            Comment.objects.create(author=author, blog_post=blog_post, content=content)
+            blog_post.refresh_from_db()
+            return render(
+                request,
+                "blog/components/comment_list.html",
+                context={"post": blog_post},
+            )
+    return HttpResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
+def remove_post_comment(request: HttpRequest, pk: int) -> HttpResponse:
+    """Remove post comment.
+
+    Args:
+        request (HttpRequest): HttpRequest object
+        pk (int): Post ID
+
+    Returns:
+        HttpResponse: HttpResponse object
+    """
+    comment = Comment.objects.get(pk=pk)
+    blog_post = comment.blog_post
+    comment.delete()
+    blog_post.refresh_from_db()
+    return render(
+        request,
+        "blog/components/comment_list.html",
+        context={"post": blog_post},
+    )

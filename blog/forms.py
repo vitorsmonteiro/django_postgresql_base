@@ -2,7 +2,7 @@ from typing import ClassVar
 
 from django import forms
 
-from blog.models import BlogPost, Topic
+from blog.models import BlogPost, Comment, Topic
 
 
 class TopicForm(forms.ModelForm):
@@ -30,4 +30,17 @@ class BlogPostForm(forms.ModelForm):
             "image",
             "content",
             "previous",
+        ]
+
+
+class CommentForm(forms.ModelForm):
+    """Post form."""
+
+    class Meta:
+        """Class meta data."""
+
+        model = Comment
+        fields: ClassVar[list[str]] = [
+            "blog_post",
+            "content",
         ]
