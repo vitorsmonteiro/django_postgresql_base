@@ -18,6 +18,7 @@ urlpatterns = [
     ),
     path("topic_list", views.TopicListView.as_view(), name="topic_list"),
     path("topic_create", views.TopicCreateView.as_view(), name="topic_create"),
+    path("topic_detail/<int:pk>", views.TopicDetailView.as_view(), name="topic_detail"),
     path("topic_update/<int:pk>", views.TopicUpdateView.as_view(), name="topic_update"),
     path("topic_delete/<int:pk>", views.TopicDeleteView.as_view(), name="topic_delete"),
     path("add_comment", views.add_post_comment, name="add_comment"),

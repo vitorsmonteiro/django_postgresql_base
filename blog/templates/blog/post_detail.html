@@ -13,7 +13,9 @@
                  width="450"
                  class="card-img-top">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item text-end">Topic: {{ post.topic }}</li>
+                <li class="list-group-item text-end">
+                    Topic: <a href="{% url 'blog:topic_detail' pk=post.topic.pk %}">{{ post.topic }}</a>
+                </li>
                 <li class="list-group-item text-end">Author: {{ post.author.first_name }} {{ post.author.last_name }}</li>
                 <li class="list-group-item text-end">Created at: {{ post.created_at }}</li>
             </ul>

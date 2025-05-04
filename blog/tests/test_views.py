@@ -30,11 +30,10 @@ class TestTopicListView:
     """Tests for Topic List View."""
 
     @staticmethod
-    def test_view_normal(topic_fixture: Topic, user_fixture: User) -> None:
+    def test_view_normal(topic_fixture: Topic) -> None:
         """Test view from normal request."""
         url = reverse_lazy("blog:topic_list")
         request = request_factory.get(url)
-        request.user = user_fixture
         response = TopicListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/topic_list.html"
@@ -44,12 +43,10 @@ class TestTopicListView:
     def test_view_htmx(
         topic_fixture: Topic,  # noqa: ARG004
         topic_fixture2: Topic,  # noqa: ARG004
-        user_fixture: User,
     ) -> None:
         """Test view from HTMX."""
         url = reverse_lazy("blog:topic_list")
         request = request_factory.get(url, headers={"Hx-Request": "true"})
-        request.user = user_fixture
         response = TopicListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/components/topic_table.html"
@@ -61,14 +58,12 @@ class TestTopicListView:
     def test_view_htmx_search(
         topic_fixture: Topic,  # noqa: ARG004
         topic_fixture2: Topic,  # noqa: ARG004
-        user_fixture: User,
     ) -> None:
         """Test view from HTMX."""
         url = reverse_lazy("blog:topic_list")
         request = request_factory.get(
             url, headers={"Hx-Request": "true"}, query_params={"search": "tes"}
         )
-        request.user = user_fixture
         response = TopicListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/components/topic_table.html"
@@ -76,15 +71,17 @@ class TestTopicListView:
             Topic.objects.filter(name__startswith="tes")
         )
 
+
+class TestTopicDetailView:
+    """Tests for Topic Detail View."""
+
     @staticmethod
-    def test_view_not_logged() -> None:
-        """Test view user not logged."""
-        url = reverse_lazy("blog:topic_list")
+    def test_view(topic_fixture: Topic) -> None:
+        """Test view from normal request."""
+        url = reverse_lazy("blog:topic_detail", args=[topic_fixture.pk])
         request = request_factory.get(url)
-        request.user = AnonymousUser()
         response = TopicListView.as_view()(request)
-        assert response.status_code == HTTPStatus.FOUND
-        assert response.url == "/login?next=/blog/topic_list"
+        assert response.status_code == HTTPStatus.OK
 
 
 class TestTopicDeleteView:
@@ -306,11 +303,10 @@ class TestBlogListView:
     """Tests for Post List View."""
 
     @staticmethod
-    def test_view_normal(blog_post_fixture: BlogPost, user_fixture: User) -> None:
+    def test_view_normal(blog_post_fixture: BlogPost) -> None:
         """Test view from normal request."""
         url = reverse_lazy("blog:post_list")
         request = request_factory.get(url)
-        request.user = user_fixture
         response = BlogPostListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/post_list.html"
@@ -320,12 +316,10 @@ class TestBlogListView:
     def test_view_htmx(
         blog_post_fixture: BlogPost,  # noqa: ARG004
         blog_post_fixture2: BlogPost,  # noqa: ARG004
-        user_fixture: User,
     ) -> None:
         """Test view from HTMX."""
         url = reverse_lazy("blog:post_list")
         request = request_factory.get(url, headers={"Hx-Request": "true"})
-        request.user = user_fixture
         response = BlogPostListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/components/post_table.html"
@@ -337,30 +331,18 @@ class TestBlogListView:
     def test_view_htmx_search(
         blog_post_fixture: BlogPost,  # noqa: ARG004
         blog_post_fixture2: BlogPost,  # noqa: ARG004
-        user_fixture: User,
     ) -> None:
         """Test view from HTMX with search."""
         url = reverse_lazy("blog:post_list")
         request = request_factory.get(
             url, headers={"Hx-Request": "true"}, query_params={"search": "tes"}
         )
-        request.user = user_fixture
         response = BlogPostListView.as_view()(request)
         assert response.status_code == HTTPStatus.OK
         assert response.template_name == "blog/components/post_table.html"
         assert list(response.context_data["object_list"]) == list(
             BlogPost.objects.filter(title__startswith="tes")
         )
-
-    @staticmethod
-    def test_view_not_logged() -> None:
-        """Test view user not logged."""
-        url = reverse_lazy("blog:post_list")
-        request = request_factory.get(url)
-        request.user = AnonymousUser()
-        response = BlogPostListView.as_view()(request)
-        assert response.status_code == HTTPStatus.FOUND
-        assert response.url == "/login?next=/blog/post_list"
 
 
 class TestBlogCreateView:

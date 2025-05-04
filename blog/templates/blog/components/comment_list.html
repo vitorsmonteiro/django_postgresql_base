@@ -6,6 +6,7 @@
         <form hx-post="{% url 'blog:add_comment' %}"
               hx-target="#comment-list"
               hx-swap="outerHTML">
+            <h2>Comments</h2>
             {% csrf_token %}
             <input type="text" name="blog_post" value="{{ post.pk }}"hidden>
             <textarea name="content"

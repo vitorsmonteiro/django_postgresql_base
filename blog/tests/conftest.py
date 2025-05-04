@@ -41,5 +41,5 @@ def blog_post_fixture2(topic_fixture2: Topic, user_fixture: User) -> BlogPost:
 def comment_fixture(blog_post_fixture: BlogPost, user_fixture: User) -> Comment:
     """Comment fixture."""
     return Comment.objects.create(
-        blog_post=blog_post_fixture, author=user_fixture, comment="test"
+        blog_post=blog_post_fixture, author=user_fixture, content="test"
     )

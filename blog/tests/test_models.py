@@ -99,7 +99,7 @@ class TestCommentModel:
         """Test comment create."""
         assert Comment.objects.exists() is False
         comment = Comment.objects.create(
-            blog_post=blog_post_fixture, author=user_fixture, comment="foo"
+            blog_post=blog_post_fixture, author=user_fixture, content="foo"
         )
         assert Comment.objects.exists() is True
         assert Comment.objects.first() == comment

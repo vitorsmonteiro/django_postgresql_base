@@ -110,7 +110,9 @@ class TestLoginForm:
         data = {"email": user_fixture.email + "2", "password": USER_PASSWORD}
         form = LoginForm(data=data)
         assert form.is_valid() is False
-        assert form.errors == {"email": ["User not found"]}
+        assert form.errors == {
+            "email": ["Enter a valid email address.", "User not found"]
+        }
 
     @staticmethod
     def test_login_wrong_password(user_fixture: User) -> None:

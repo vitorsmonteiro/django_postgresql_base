@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Any, ClassVar, Self
 
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -20,7 +20,7 @@ from blog.models import BlogPost, Comment, Topic
 from main_project.settings import PAGINATION_SIZE
 
 
-class TopicListView(LoginRequiredMixin, ListView):
+class TopicListView(ListView):
     """List topic generic view."""
 
     model = Topic
@@ -59,6 +59,19 @@ class TopicCreateView(PermissionRequiredMixin, CreateView):
         return context
 
 
+class TopicDetailView(DetailView):
+    """Topic generic detail view."""
+
+    model = Topic
+    template_name = "blog/topic_detail.html"
+
+    def get_context_data(self, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        """Add context data."""
+        context = super().get_context_data(**kwargs)
+        context["posts"] = BlogPost.objects.filter(topic=self.get_object())
+        return context
+
+
 class TopicUpdateView(PermissionRequiredMixin, UpdateView):
     """Topic generic update view."""
 
@@ -86,7 +99,7 @@ class TopicDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required: ClassVar[list[str]] = ["blog.delete_topic"]
 
 
-class BlogPostListView(LoginRequiredMixin, ListView):
+class BlogPostListView(ListView):
     """Post generic list view."""
 
     model = BlogPost
@@ -226,7 +239,9 @@ def add_post_comment(request: HttpRequest) -> HttpResponse:
             author = request.user
             blog_post: BlogPost = form.cleaned_data["blog_post"]
             content = form.cleaned_data["content"]
-            Comment.objects.create(author=author, blog_post=blog_post, content=content)
+            Comment.objects.create(
+                author=author, blog_post=blog_post, content=content
+            )
             blog_post.refresh_from_db()
             return render(
                 request,

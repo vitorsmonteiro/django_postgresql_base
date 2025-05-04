@@ -24,19 +24,22 @@
         </title>
     </head>
     <body>
-        {% include "common/navbar.html" %}
+        <header class="sticky-top">
+            {% include "common/navbar.html" %}
+        </header>
         <main class="flex-shrink-0 mb-5">
-            <div class="container mt-3 center">
+            <div class="container center pb-1">
                 {% block content %}
                 {% endblock content %}
             </div>
         </main>
+        <footer class="footer">
         {% block footer %}
             {% include "common/footer.html" %}
         {% endblock footer %}
+        </footer>
         <script src="{% static 'common/bootstrap.js' %}"></script>
         <script src="{% static 'common/htmx.min.js' %}"></script>
         <script src="{% static 'common/darkmode.js' %}"></script>
-
     </body>
 </html>
