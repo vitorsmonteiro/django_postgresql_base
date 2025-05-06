@@ -53,5 +53,5 @@ def image_upload_fixture() -> Generator[SimpleUploadedFile]:
         image = SimpleUploadedFile("image.jpg", file.read(), content_type="image/jpeg")
     yield image
     path = Path(MEDIA_ROOT)
-    if path.exists and path.is_dir:
+    if path.exists() and path.is_dir():
         shutil.rmtree(path=path)

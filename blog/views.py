@@ -239,9 +239,7 @@ def add_post_comment(request: HttpRequest) -> HttpResponse:
             author = request.user
             blog_post: BlogPost = form.cleaned_data["blog_post"]
             content = form.cleaned_data["content"]
-            Comment.objects.create(
-                author=author, blog_post=blog_post, content=content
-            )
+            Comment.objects.create(author=author, blog_post=blog_post, content=content)
             blog_post.refresh_from_db()
             return render(
                 request,

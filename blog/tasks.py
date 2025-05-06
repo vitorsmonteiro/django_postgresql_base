@@ -1,7 +1,7 @@
 from django.core.mail import EmailMultiAlternatives
 
 from blog.models import Comment
-from celery import shared_task
+from celery import shared_task  # type: ignore[attr-defined]
 
 
 @shared_task
