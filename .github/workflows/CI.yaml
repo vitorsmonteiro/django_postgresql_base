@@ -37,5 +37,5 @@ jobs:
         run: docker compose exec web python manage.py migrate
         if: always()
       - name: Run tests
-        run: docker compose exec web pytest -n 4
+        run: docker compose exec web pytest
         if: always()
