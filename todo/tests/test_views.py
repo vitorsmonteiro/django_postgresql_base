@@ -1,47 +1,14 @@
 from http import HTTPStatus
 
 import pytest
-from django.test import Client, RequestFactory
+from django.test import Client
 from django.urls import reverse_lazy
 
 from authentication.models import User
 from authentication.tests.fixtures import USER_PASSWORD
-from todo import views
 from todo.models import Task
 
 pytestmark = pytest.mark.django_db
-factory = RequestFactory()
-
-
-class TestHomeView:
-    """Test home view."""
-
-    @staticmethod
-    def test_home_view_no_login(client: Client) -> None:
-        """Test home view with user not loged."""
-        url = reverse_lazy("todo:home")
-        response = client.get(url)
-        assert response.status_code == HTTPStatus.FOUND
-
-    @staticmethod
-    def test_home_view(user_fixture: User, task_fixture: Task) -> None:
-        """Tesh home view with user that has tasks."""
-        url = reverse_lazy("todo:home")
-        request = factory.get(url)
-        request.user = user_fixture
-        response = views.home(request=request)
-        assert response.status_code == HTTPStatus.OK
-        assert task_fixture.title in str(response.content)
-
-    @staticmethod
-    def test_home_view_no_tasks(user_fixture2: User, task_fixture: Task) -> None:
-        """Tesh home view with user that has no tasks."""
-        url = reverse_lazy("todo:home")
-        request = factory.get(url)
-        request.user = user_fixture2
-        response = views.home(request=request)
-        assert response.status_code == HTTPStatus.OK
-        assert task_fixture.title not in str(response.content)
 
 
 class TestTaskListView:

@@ -4,5 +4,5 @@
 {% endblock title %}
 {% block content %}
     <h1>{{ request.user.first_name }} task list</h1>
-    <div class="container mt-3">{% include "todo/components/task_table.html" %}</div>
+    <div class="container mt-3" id="todo-result">{% include "todo/components/task_table.html" %}</div>
 {% endblock content %}

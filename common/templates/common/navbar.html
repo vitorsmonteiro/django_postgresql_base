@@ -19,7 +19,7 @@
                 </li>
                 <li class="nav-item">
                     <a {% if request.resolver_match.app_name == "todo" %}class="nav-link active"{% else %}class="nav-link"{% endif %}
-                       href="{% url 'todo:home' %}">Todo</a>
+                       href="{% url 'todo:task_list' %}">Todo</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle"

@@ -1,11 +1,8 @@
 from typing import Self
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.paginator import Paginator
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -20,32 +17,23 @@ from todo.forms import TaskForm
 from todo.models import Task
 
 
-@login_required
-def home(request: HttpRequest) -> HttpResponse:
-    """Todo home view.
-
-    Args:
-        request (HttpRequest): Http request object.
-
-    Returns:
-        HttpResponse: Http response object
-    """
-    tasks = Task.objects.filter(created_by=request.user)
-    tasks = tasks.order_by("created_at")
-    paginator = Paginator(tasks, PAGINATION_SIZE)
-    page_obj = paginator.get_page(1)
-    context = {"page_obj": page_obj}
-    return render(request=request, template_name="todo/task_list.html", context=context)
-
-
 class TaskList(LoginRequiredMixin, ListView):
     """Task generic list view."""
 
     model = Task
-    template_name = "todo/components/task_table.html"
     context_object_name = "tasks"
     paginate_by = PAGINATION_SIZE
     ordering = "created_at"
+
+    def get_template_names(self: Self) -> str:
+        """Get template names.
+
+        Returns:
+            str: Template name.
+        """
+        if self.request.headers.get("Hx-Request"):
+            return "todo/components/task_table.html"
+        return "todo/task_list.html"
 
     def get_queryset(self: Self) -> QuerySet:
         """Get filtered query set.
@@ -68,7 +56,7 @@ class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
     template_name = "todo/task_create.html"
     form_class = TaskForm
-    success_url = reverse_lazy("todo:home")
+    success_url = reverse_lazy("todo:task_list")
 
     def form_valid(self: Self, form: TaskForm) -> HttpResponse:
         """Override the form valid metod to add created_by.
@@ -91,7 +79,7 @@ class TaskUpdate(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Task
     template_name = "todo/task_update.html"
     form_class = TaskForm
-    success_url = reverse_lazy("todo:home")
+    success_url = reverse_lazy("todo:task_list")
     context_object_name = "task"
 
     def test_func(self: Self) -> bool:
@@ -105,7 +93,7 @@ class TaskDelete(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     model = Task
     template_name = "todo/task_confirm_delete.html"
-    success_url = reverse_lazy("todo:home")
+    success_url = reverse_lazy("todo:task_list")
     context_object_name = "task"
 
     def test_func(self: Self) -> bool:
